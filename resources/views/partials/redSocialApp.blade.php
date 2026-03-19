@@ -206,9 +206,17 @@
         width: calc(100% - 28px);
         margin: 0 14px 14px;
         border-radius: 12px;
-        border: 2px solid #5a5250;
-        max-height: 360px;
-        object-fit: cover;
+        border: none;
+        height: 340px;
+        max-height: 340px;
+        object-fit: contain;
+        object-position: left center;
+        background: transparent;
+    }
+
+    #socialModal #sectionInicio .post-image {
+        height: 300px;
+        max-height: 300px;
     }
 
     #socialModal .post-actions {
@@ -219,6 +227,100 @@
         justify-content: space-around;
         font-weight: 600;
         font-size: 1rem;
+    }
+
+    #socialModal .post-action-btn {
+        border: none;
+        background: transparent;
+        color: #443C3D;
+        font-weight: 700;
+        font-size: 1rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        padding: 8px 10px;
+        border-radius: 12px;
+    }
+
+    #socialModal .post-action-btn:hover {
+        background: #D0C4B4;
+    }
+
+    #socialModal .post-action-btn.liked {
+        color: #d42f2f;
+    }
+
+    #socialModal .post-action-btn.delete {
+        color: #9b2f2f;
+    }
+
+    #socialModal .comments-list {
+        margin-top: 12px;
+        max-height: 280px;
+        overflow: auto;
+        display: grid;
+        gap: 10px;
+    }
+
+    #socialModal .comment-item {
+        border: 2px solid #5a5250;
+        border-radius: 14px;
+        background: #f2f2f2;
+        padding: 10px 12px;
+    }
+
+    #socialModal .comment-media {
+        width: min(100%, 420px);
+        height: 220px;
+        max-height: 220px;
+        object-fit: contain;
+        object-position: left center;
+        display: block;
+        border: none;
+        border-radius: 10px;
+        margin: 8px 0 0 0;
+        background: transparent;
+    }
+
+    #socialModal .comment-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 6px;
+    }
+
+    #socialModal .comment-head-main {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+    }
+
+    #socialModal .comment-delete-btn {
+        border: 1px solid #9b2f2f;
+        background: #fff;
+        color: #9b2f2f;
+        border-radius: 10px;
+        padding: 4px 8px;
+        cursor: pointer;
+        font-size: 0.8rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    #socialModal .comment-delete-btn:hover {
+        background: #9b2f2f;
+        color: #fff;
+    }
+
+    #socialModal .comment-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        border: 2px solid #5a5250;
+        object-fit: cover;
     }
 
     #socialModal .profiles-header {
@@ -301,9 +403,24 @@
         align-items: center;
     }
 
+    body.dark-mode #socialModal .profile-top {
+        background: #272022;
+        color: #E2D8CC;
+    }
+
+    body.dark-mode #socialModal .profile-top .profile-name,
+    body.dark-mode #socialModal .profile-top .profile-user,
+    body.dark-mode #socialModal .profile-top .profile-meta {
+        color: #E2D8CC !important;
+    }
+
+    body.dark-mode #socialModal .profile-top .profile-meta strong {
+        color: #E2D8CC !important;
+    }
+
     #socialModal .tabs {
         display: flex;
-        gap: 24px;
+        gap: 10px;
         padding: 12px 14px;
         border-bottom: 2px solid #5a5250;
         background: #D0C4B4;
@@ -311,19 +428,65 @@
         font-size: 1rem;
     }
 
+    body.dark-mode #socialModal .tabs {
+        background: #1f1a1c;
+    }
+
     #socialModal .tabs button {
-        border: none;
-        background: transparent;
-        color: #7a7172;
+        border: 1px solid transparent;
+        background: rgba(255, 255, 255, 0.32);
+        color: #5f5758;
         cursor: pointer;
-        padding-bottom: 8px;
-        border-bottom: 4px solid transparent;
+        padding: 8px 14px;
+        border-radius: 10px;
         font-size: 1rem;
+        transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    #socialModal .tabs button:hover {
+        transform: translateY(-1px);
+        border-color: rgba(68, 60, 61, 0.45);
+        color: #443C3D;
     }
 
     #socialModal .tabs button.active {
-        color: #443C3D;
-        border-bottom-color: #443C3D;
+        color: #E2D8CC;
+        background: #443C3D;
+        border-color: #5a5250;
+    }
+
+    body.dark-mode #socialModal .tabs button {
+        background: rgba(39, 32, 34, 0.72);
+        color: #CBBEAF;
+    }
+
+    body.dark-mode #socialModal .tabs button:hover {
+        border-color: rgba(181, 155, 121, 0.6);
+        color: #E2D8CC;
+    }
+
+    body.dark-mode #socialModal .tabs button.active {
+        background: #B59B79;
+        color: #1C1819;
+        border-color: #B59B79;
+    }
+
+    @keyframes tabSlideInRight {
+        from { opacity: 0; transform: translateX(10px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes tabSlideInLeft {
+        from { opacity: 0; transform: translateX(-10px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    #socialModal .tab-enter-right {
+        animation: tabSlideInRight 0.2s ease;
+    }
+
+    #socialModal .tab-enter-left {
+        animation: tabSlideInLeft 0.2s ease;
     }
 
     #socialModal .gallery {
@@ -353,6 +516,61 @@
     }
 
     #socialModal .modal-backdrop.active { display: flex; }
+
+    #socialModal .image-viewer-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.82);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 2600;
+        padding: 16px;
+    }
+
+    #socialModal .image-viewer-backdrop.active {
+        display: flex;
+    }
+
+    #socialModal .image-viewer-content {
+        position: relative;
+        width: min(1200px, calc(100vw - 32px));
+        height: min(88vh, calc(100vh - 32px));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #socialModal .image-viewer-img {
+        max-width: 100%;
+        max-height: 100%;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        border-radius: 12px;
+        box-shadow: 0 14px 36px rgba(0, 0, 0, 0.5);
+        background: transparent;
+    }
+
+    #socialModal .image-viewer-close {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        z-index: 5;
+        pointer-events: auto;
+        width: 36px;
+        height: 36px;
+        border: none;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.15);
+        color: #fff;
+        cursor: pointer;
+        font-size: 1.1rem;
+    }
+
+    #socialModal .image-viewer-close:hover {
+        background: rgba(255, 255, 255, 0.28);
+    }
 
     #socialModal .modal-box {
         width: min(860px, calc(100% - 24px));
@@ -551,7 +769,6 @@
             <section id="sectionInicio" class="section active">
                 @if($userType === 'admin')
                 <div class="composer">
-                    <img class="avatar" id="composerAvatar" alt="avatar" />
                     <input type="text" readonly value="¿Qué quieres publicar hoy?" />
                     <button type="button" class="primary-btn" onclick="openPostModal()"><i class="fa-solid fa-plus"></i> Publicar</button>
                 </div>
@@ -571,6 +788,7 @@
             </section>
 
             <section id="sectionPerfilDetalle" class="section"></section>
+            <section id="sectionPostDetalle" class="section"></section>
         </main>
     </div>
 </div>
@@ -726,16 +944,21 @@
     </div>
 </div>
 
+@include('partials.imagen')
+
 <script>
     const USER_TYPE = @json($userType ?? 'guest');
+    const CSRF_TOKEN = @json(csrf_token());
     const STORAGE_CHARACTERS = 'social_characters_v1';
     const STORAGE_POSTS = 'social_posts_v1';
+    const STORAGE_POST_LIKES = `social_liked_posts_v1_${USER_TYPE}`;
     const MIN_WIDTH = 320;
     const MIN_HEIGHT = 240;
 
     let currentView = 'inicio';
     let selectedProfileId = null;
     let editingProfileId = null;
+    let selectedPostId = null;
     let isMaximized = false;
 
     const defaultCharacters = [
@@ -745,10 +968,54 @@
     ];
 
     const defaultPosts = [
-        { id: 'post-1', characterId: 'char-1', text: '¡Acabo de terminar mi primer proyecto! Muy emocionada de compartirlo con todos. 🎉', image: '', createdAt: Date.now() - (2 * 60 * 60 * 1000), likes: 24, comments: 2 },
-        { id: 'post-2', characterId: 'char-2', text: 'Trabajando en algo increíble. No puedo esperar para mostrárselo al mundo. #desarrollo #tech', image: '', createdAt: Date.now() - (4 * 60 * 60 * 1000), likes: 42, comments: 1 },
-        { id: 'post-3', characterId: 'char-1', text: 'Trabajando en un nuevo proyecto de diseño vintage. ¡Me encanta este estilo retro! 😍✨', image: 'https://images.unsplash.com/photo-1487611459768-bd414656ea10?auto=format&fit=crop&w=1000&q=80', createdAt: Date.now() - (3 * 60 * 60 * 1000), likes: 89, comments: 2 },
-        { id: 'post-4', characterId: 'char-1', text: '', image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1000&q=80', createdAt: Date.now() - (8 * 60 * 60 * 1000), likes: 54, comments: 3 }
+        {
+            id: 'post-1',
+            characterId: 'char-1',
+            text: '¡Acabo de terminar mi primer proyecto! Muy emocionada de compartirlo con todos. 🎉',
+            image: '',
+            createdAt: Date.now() - (2 * 60 * 60 * 1000),
+            likes: 24,
+            commentsList: [
+                { id: 'comment-1', characterId: 'char-2', text: '¡Felicidades!', createdAt: Date.now() - (30 * 60 * 1000) },
+                { id: 'comment-2', characterId: 'char-3', text: 'Increíble trabajo', createdAt: Date.now() - (60 * 60 * 1000) },
+            ],
+        },
+        {
+            id: 'post-2',
+            characterId: 'char-2',
+            text: 'Trabajando en algo increíble. No puedo esperar para mostrárselo al mundo. #desarrollo #tech',
+            image: '',
+            createdAt: Date.now() - (4 * 60 * 60 * 1000),
+            likes: 42,
+            commentsList: [
+                { id: 'comment-3', characterId: 'char-1', text: '¡Se viene algo grande!', createdAt: Date.now() - (90 * 60 * 1000) },
+            ],
+        },
+        {
+            id: 'post-3',
+            characterId: 'char-1',
+            text: 'Trabajando en un nuevo proyecto de diseño vintage. ¡Me encanta este estilo retro! 😍✨',
+            image: 'https://images.unsplash.com/photo-1487611459768-bd414656ea10?auto=format&fit=crop&w=1000&q=80',
+            createdAt: Date.now() - (3 * 60 * 60 * 1000),
+            likes: 89,
+            commentsList: [
+                { id: 'comment-4', characterId: 'char-3', text: 'Ese estilo está brutal 🔥', createdAt: Date.now() - (70 * 60 * 1000) },
+                { id: 'comment-5', characterId: 'char-2', text: 'Muy buen diseño', createdAt: Date.now() - (50 * 60 * 1000) },
+            ],
+        },
+        {
+            id: 'post-4',
+            characterId: 'char-1',
+            text: '',
+            image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1000&q=80',
+            createdAt: Date.now() - (8 * 60 * 60 * 1000),
+            likes: 54,
+            commentsList: [
+                { id: 'comment-6', characterId: 'char-2', text: 'Qué foto tan buena 👏', createdAt: Date.now() - (7 * 60 * 60 * 1000) },
+                { id: 'comment-7', characterId: 'char-3', text: 'Hermosa vista', createdAt: Date.now() - (6 * 60 * 60 * 1000) },
+                { id: 'comment-8', characterId: 'char-1', text: 'Gracias por comentar 💛', createdAt: Date.now() - (5 * 60 * 60 * 1000) },
+            ],
+        }
     ];
 
     function sendSocialMessage(type, extra = {}) {
@@ -758,6 +1025,24 @@
         } else {
             window.postMessage(payload, '*');
         }
+    }
+
+    function openImageViewer(imageSrc, imageAlt = 'Vista previa') {
+        if (!imageSrc) return;
+        const modal = document.getElementById('imageViewerModal');
+        const image = document.getElementById('imageViewerImg');
+        if (!modal || !image) return;
+        image.src = imageSrc;
+        image.alt = imageAlt;
+        modal.classList.add('active');
+    }
+
+    function closeImageViewer() {
+        const modal = document.getElementById('imageViewerModal');
+        const image = document.getElementById('imageViewerImg');
+        if (!modal || !image) return;
+        modal.classList.remove('active');
+        image.removeAttribute('src');
     }
 
     function getCharacters() {
@@ -771,16 +1056,48 @@
 
     function setCharacters(items) { localStorage.setItem(STORAGE_CHARACTERS, JSON.stringify(items)); }
 
+    function normalizePost(post) {
+        const commentsList = Array.isArray(post?.commentsList) ? post.commentsList : [];
+        return {
+            ...post,
+            likes: Math.max(0, Number(post?.likes || 0)),
+            commentsList,
+            comments: commentsList.length,
+        };
+    }
+
     function getPosts() {
         const raw = localStorage.getItem(STORAGE_POSTS);
         if (!raw) {
-            localStorage.setItem(STORAGE_POSTS, JSON.stringify(defaultPosts));
-            return [...defaultPosts];
+            const normalizedDefaults = defaultPosts.map(normalizePost);
+            localStorage.setItem(STORAGE_POSTS, JSON.stringify(normalizedDefaults));
+            return [...normalizedDefaults];
         }
-        return JSON.parse(raw);
+        const parsed = JSON.parse(raw).map(normalizePost);
+        localStorage.setItem(STORAGE_POSTS, JSON.stringify(parsed));
+        return parsed;
     }
 
-    function setPosts(items) { localStorage.setItem(STORAGE_POSTS, JSON.stringify(items)); }
+    function setPosts(items) { localStorage.setItem(STORAGE_POSTS, JSON.stringify(items.map(normalizePost))); }
+
+    function getLikedPostIds() {
+        const raw = localStorage.getItem(STORAGE_POST_LIKES);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+    }
+
+    function setLikedPostIds(items) {
+        localStorage.setItem(STORAGE_POST_LIKES, JSON.stringify(items));
+    }
+
+    function hasLikedPost(postId) {
+        return getLikedPostIds().includes(postId);
+    }
+
+    function findPost(postId) {
+        return getPosts().find(item => item.id === postId);
+    }
 
     function findCharacter(id) { return getCharacters().find(item => item.id === id); }
 
@@ -794,6 +1111,7 @@
         document.getElementById('sectionInicio').classList.remove('active');
         document.getElementById('sectionPerfiles').classList.remove('active');
         document.getElementById('sectionPerfilDetalle').classList.remove('active');
+        document.getElementById('sectionPostDetalle').classList.remove('active');
         document.getElementById('menuInicio').classList.remove('active');
         document.getElementById('menuPerfiles').classList.remove('active');
 
@@ -803,6 +1121,9 @@
         } else if (section === 'perfiles') {
             document.getElementById('sectionPerfiles').classList.add('active');
             document.getElementById('menuPerfiles').classList.add('active');
+        } else if (section === 'postDetalle') {
+            document.getElementById('sectionPostDetalle').classList.add('active');
+            document.getElementById('menuInicio').classList.add('active');
         } else {
             document.getElementById('sectionPerfilDetalle').classList.add('active');
             document.getElementById('menuPerfiles').classList.add('active');
@@ -823,10 +1144,12 @@
     function renderFeed() {
         const feed = document.getElementById('feedList');
         const posts = getPosts().sort((a, b) => b.createdAt - a.createdAt);
+        const likedPostIds = getLikedPostIds();
 
         feed.innerHTML = posts.map(post => {
             const char = findCharacter(post.characterId);
             if (!char) return '';
+            const liked = likedPostIds.includes(post.id);
             return `
                 <article class="card">
                     <div class="post-head">
@@ -837,11 +1160,12 @@
                         </div>
                     </div>
                     ${post.text ? `<div class="post-body">${escapeHtml(post.text).replace(/\n/g, '<br>')}</div>` : ''}
-                    ${post.image ? `<img class="post-image" src="${post.image}" alt="post-image" />` : ''}
+                    ${post.image ? `<img class="post-image" src="${post.image}" alt="post-image" onclick="openImageViewer(this.src, 'Imagen de publicación')" />` : ''}
                     <div class="post-actions">
-                        <div><i class="fa-regular fa-heart"></i> ${post.likes ?? 0}</div>
-                        <div><i class="fa-regular fa-comment"></i> ${post.comments ?? 0}</div>
-                        <div><i class="fa-solid fa-share-nodes"></i> Compartir</div>
+                        <button type="button" class="post-action-btn ${liked ? 'liked' : ''}" ${liked ? 'disabled' : ''} onclick="likePost('${post.id}')"><i class="${liked ? 'fa-solid' : 'fa-regular'} fa-heart"></i> ${post.likes ?? 0}</button>
+                        <button type="button" class="post-action-btn" onclick="openCommentsModal('${post.id}')"><i class="fa-regular fa-comment"></i> ${post.comments ?? 0}</button>
+                        <button type="button" class="post-action-btn" onclick="sharePost()"><i class="fa-solid fa-share-nodes"></i> Compartir</button>
+                        ${USER_TYPE === 'admin' ? `<button type="button" class="post-action-btn delete" onclick="deletePost('${post.id}')"><i class="fa-regular fa-trash-can"></i> Eliminar</button>` : ''}
                     </div>
                 </article>
             `;
@@ -875,6 +1199,7 @@
         const posts = getPosts().filter(post => post.characterId === profileId).sort((a,b) => b.createdAt - a.createdAt);
         const mediaPosts = posts.filter(post => !!post.image);
 
+        const likedPostIds = getLikedPostIds();
         const detail = document.getElementById('sectionPerfilDetalle');
         detail.innerHTML = `
             <div style="margin-bottom: 10px;">
@@ -892,7 +1217,7 @@
                         <div class="profile-name" style="font-size:1.6rem;">${char.name}</div>
                         <div class="profile-user" style="font-size:1rem;">${char.username}</div>
                         <div style="margin-top:8px;font-size:1rem;">${escapeHtml(char.bio)}</div>
-                        <div style="margin-top:8px;display:flex;gap:22px;color:#7a7172;font-size:0.9rem;">
+                        <div class="profile-meta" style="margin-top:8px;display:flex;gap:22px;color:#7a7172;font-size:0.9rem;">
                             <span><strong style="color:#443C3D;">${char.followers ?? 0}</strong> Seguidores</span>
                             <span><strong style="color:#443C3D;">${char.following ?? 0}</strong> Siguiendo</span>
                             <span>Se unió en ${char.joined ?? '-'}</span>
@@ -906,7 +1231,9 @@
                 </div>
 
                 <div id="detailPosts" style="padding: 12px;">
-                    ${posts.length ? posts.map(post => `
+                    ${posts.length ? posts.map(post => {
+                        const liked = likedPostIds.includes(post.id);
+                        return `
                         <article class="card">
                             <div class="post-head">
                                 <img class="avatar" src="${char.avatar}" alt="avatar" />
@@ -916,18 +1243,20 @@
                                 </div>
                             </div>
                             ${post.text ? `<div class="post-body">${escapeHtml(post.text).replace(/\n/g, '<br>')}</div>` : ''}
-                            ${post.image ? `<img class="post-image" src="${post.image}" alt="post-image" />` : ''}
+                            ${post.image ? `<img class="post-image" src="${post.image}" alt="post-image" onclick="openImageViewer(this.src, 'Imagen de publicación')" />` : ''}
                             <div class="post-actions">
-                                <div><i class="fa-regular fa-heart"></i> ${post.likes ?? 0}</div>
-                                <div><i class="fa-regular fa-comment"></i> ${post.comments ?? 0}</div>
-                                <div><i class="fa-solid fa-share-nodes"></i> Compartir</div>
+                                <button type="button" class="post-action-btn ${liked ? 'liked' : ''}" ${liked ? 'disabled' : ''} onclick="likePost('${post.id}')"><i class="${liked ? 'fa-solid' : 'fa-regular'} fa-heart"></i> ${post.likes ?? 0}</button>
+                                <button type="button" class="post-action-btn" onclick="openCommentsModal('${post.id}')"><i class="fa-regular fa-comment"></i> ${post.comments ?? 0}</button>
+                                <button type="button" class="post-action-btn" onclick="sharePost()"><i class="fa-solid fa-share-nodes"></i> Compartir</button>
+                                ${USER_TYPE === 'admin' ? `<button type="button" class="post-action-btn delete" onclick="deletePost('${post.id}')"><i class="fa-regular fa-trash-can"></i> Eliminar</button>` : ''}
                             </div>
                         </article>
-                    `).join('') : '<div class="small" style="padding:14px;">Este personaje aún no tiene publicaciones.</div>'}
+                    `;
+                    }).join('') : '<div class="small" style="padding:14px;">Este personaje aún no tiene publicaciones.</div>'}
                 </div>
 
                 <div id="detailMedia" style="display:none;">
-                    ${mediaPosts.length ? `<div class="gallery">${mediaPosts.map(post => `<img src="${post.image}" alt="media">`).join('')}</div>` : '<div class="small" style="padding:14px;">No hay multimedia para mostrar.</div>'}
+                    ${mediaPosts.length ? `<div class="gallery">${mediaPosts.map(post => `<img src="${post.image}" alt="media" onclick="openImageViewer(this.src, 'Imagen multimedia')">`).join('')}</div>` : '<div class="small" style="padding:14px;">No hay multimedia para mostrar.</div>'}
                 </div>
             </div>
         `;
@@ -942,17 +1271,303 @@
         const boxMedia = document.getElementById('detailMedia');
         if (!btnPosts || !btnMedia || !boxPosts || !boxMedia) return;
 
+        const animatePanel = (panel, className) => {
+            panel.classList.remove('tab-enter-left', 'tab-enter-right');
+            panel.classList.add(className);
+            setTimeout(() => panel.classList.remove(className), 220);
+        };
+
         if (tab === 'posts') {
             btnPosts.classList.add('active');
             btnMedia.classList.remove('active');
             boxPosts.style.display = 'block';
             boxMedia.style.display = 'none';
+            animatePanel(boxPosts, 'tab-enter-left');
         } else {
             btnPosts.classList.remove('active');
             btnMedia.classList.add('active');
             boxPosts.style.display = 'none';
             boxMedia.style.display = 'block';
+            animatePanel(boxMedia, 'tab-enter-right');
         }
+    }
+
+    function rerenderPostContexts() {
+        renderFeed();
+        if (selectedProfileId && currentView === 'perfilDetalle') {
+            openProfileDetail(selectedProfileId);
+        }
+        if (selectedPostId && currentView === 'postDetalle') {
+            renderCommentsModal();
+        }
+    }
+
+    function likePost(postId) {
+        const likedPostIds = getLikedPostIds();
+        if (likedPostIds.includes(postId)) return;
+
+        const posts = getPosts();
+        const index = posts.findIndex(item => item.id === postId);
+        if (index === -1) return;
+
+        posts[index] = {
+            ...posts[index],
+            likes: Math.max(0, Number(posts[index].likes || 0)) + 1,
+        };
+
+        likedPostIds.push(postId);
+        setLikedPostIds(likedPostIds);
+        setPosts(posts);
+        rerenderPostContexts();
+    }
+
+    async function deletePost(postId) {
+        if (USER_TYPE !== 'admin') return;
+        if (!confirm('¿Seguro que deseas eliminar esta publicación?')) return;
+
+        const currentPosts = getPosts();
+        const targetPost = currentPosts.find(item => item.id === postId);
+        if (!targetPost) return;
+
+        if (targetPost.dbId) {
+            try {
+                await deletePostInDatabase(targetPost.dbId);
+            } catch (error) {
+                alert(error.message || 'No se pudo eliminar en la base de datos.');
+                return;
+            }
+        }
+
+        const posts = currentPosts.filter(item => item.id !== postId);
+        setPosts(posts);
+
+        const likedPostIds = getLikedPostIds().filter(id => id !== postId);
+        setLikedPostIds(likedPostIds);
+
+        if (selectedPostId === postId) {
+            selectedPostId = null;
+            openSection('inicio');
+        }
+
+        rerenderPostContexts();
+    }
+
+    function sharePost() {
+        alert('Compartir: Funcionalidad en desarrollo.');
+    }
+
+    function closeCommentsModal() {
+        selectedPostId = null;
+        openSection('inicio');
+    }
+
+    function openCommentsModal(postId) {
+        selectedPostId = postId;
+        renderCommentsModal();
+        openSection('postDetalle');
+    }
+
+    function renderCommentsModal() {
+        const post = findPost(selectedPostId);
+        if (!post) return;
+
+        const author = findCharacter(post.characterId);
+        const container = document.getElementById('sectionPostDetalle');
+        if (!container) return;
+
+        const comments = Array.isArray(post.commentsList) ? post.commentsList : [];
+
+        container.innerHTML = `
+            <div style="margin-bottom: 10px;">
+                <button type="button" class="ghost-btn" onclick="closeCommentsModal()"><i class="fa-solid fa-arrow-left"></i> Volver</button>
+            </div>
+
+            <div class="card" style="margin-bottom: 12px;">
+                <div class="post-head">
+                    <img class="avatar" src="${author?.avatar || ''}" alt="avatar" />
+                    <div>
+                        <div style="font-weight: 800; font-size: 1.1rem;">${escapeHtml(author?.name || 'Autor')}</div>
+                        <div style="color:#7a7172; font-size: 0.9rem;">${hoursAgoLabel(post.createdAt)}</div>
+                    </div>
+                </div>
+                ${post.text ? `<div class="post-body">${escapeHtml(post.text).replace(/\n/g, '<br>')}</div>` : ''}
+                ${post.image ? `<img class="post-image" src="${post.image}" alt="post-image" onclick="openImageViewer(this.src, 'Imagen de publicación')" />` : ''}
+                <div class="post-actions">
+                    <button type="button" class="post-action-btn ${hasLikedPost(post.id) ? 'liked' : ''}" ${hasLikedPost(post.id) ? 'disabled' : ''} onclick="likePost('${post.id}')"><i class="${hasLikedPost(post.id) ? 'fa-solid' : 'fa-regular'} fa-heart"></i> ${post.likes ?? 0}</button>
+                    <button type="button" class="post-action-btn" onclick="openCommentsModal('${post.id}')"><i class="fa-regular fa-comment"></i> ${post.comments ?? 0}</button>
+                    <button type="button" class="post-action-btn" onclick="sharePost()"><i class="fa-solid fa-share-nodes"></i> Compartir</button>
+                    ${USER_TYPE === 'admin' ? `<button type="button" class="post-action-btn delete" onclick="deletePost('${post.id}')"><i class="fa-regular fa-trash-can"></i> Eliminar</button>` : ''}
+                </div>
+            </div>
+
+            <div class="card" style="padding: 12px;">
+                <h3 style="font-size: 2rem; font-weight: 800; margin-bottom: 8px;">Comentarios (${comments.length})</h3>
+                <div id="commentsList" class="comments-list"></div>
+                ${USER_TYPE === 'admin' ? `
+                    <div class="card" style="margin-top: 12px; padding: 12px;">
+                        <label style="font-weight:700; font-size: 1rem;">Comentar como:</label>
+                        <select class="select" id="commentCharacter"></select>
+
+                        <div style="margin-top: 10px;">
+                            <label style="font-weight:700; font-size: 1rem;">Mensaje</label>
+                            <textarea class="textarea" id="commentText" placeholder="Escribe un comentario..."></textarea>
+                        </div>
+
+                        <div style="margin-top: 10px;">
+                            <label style="font-weight:700; font-size: 1rem;"><i class="fa-regular fa-image"></i> Imagen o GIF (opcional)</label>
+                            <input class="hidden-file-input" type="file" id="commentImage" accept="image/*" onchange="updateImagePreview('commentImage', 'commentImageZone', 'commentImagePreview')" />
+                            <div class="upload-zone" id="commentImageZone" onclick="triggerFileInput('commentImage')" style="min-height: 110px;">
+                                <img id="commentImagePreview" class="upload-preview" alt="Vista previa comentario">
+                                <div class="upload-zone-content">
+                                    <i class="fa-regular fa-image"></i>
+                                    <div class="upload-zone-title">Haz clic para subir imagen o GIF</div>
+                                    <div class="upload-zone-sub">PNG · JPG · GIF · WEBP</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="display:flex; justify-content:flex-end; margin-top: 10px;">
+                            <button type="button" class="primary-btn" onclick="publishComment()"><i class="fa-solid fa-paper-plane"></i> Enviar</button>
+                        </div>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+
+        const list = document.getElementById('commentsList');
+        if (!list) return;
+        list.innerHTML = comments.length > 0
+            ? comments.map(comment => {
+                const char = findCharacter(comment.characterId);
+                return `
+                    <div class="comment-item">
+                        <div class="comment-head">
+                            <div class="comment-head-main">
+                                <img class="comment-avatar" src="${char?.avatar || ''}" alt="avatar" />
+                                <div>
+                                    <div style="font-weight:800;">${escapeHtml(char?.name || 'Usuario')}</div>
+                                    <div class="small">${hoursAgoLabel(comment.createdAt)}</div>
+                                </div>
+                            </div>
+                            ${USER_TYPE === 'admin' ? `<button type="button" class="comment-delete-btn" onclick="deleteComment('${comment.id}')"><i class="fa-regular fa-trash-can"></i> Eliminar</button>` : ''}
+                        </div>
+                        <div>${escapeHtml(comment.text).replace(/\n/g, '<br>')}</div>
+                        ${comment.image ? `<img class="comment-media" src="${comment.image}" alt="comment-image" onclick="openImageViewer(this.src, 'Imagen de comentario')" />` : ''}
+                    </div>
+                `;
+            }).join('')
+            : '<div class="small">Este post aún no tiene comentarios.</div>';
+
+        if (USER_TYPE === 'admin') {
+            const select = document.getElementById('commentCharacter');
+            if (select) {
+                const chars = getCharacters();
+                select.innerHTML = chars.map(char => `<option value="${char.id}">${char.name} (${char.username})</option>`).join('');
+            }
+            const commentText = document.getElementById('commentText');
+            if (commentText) commentText.value = '';
+            const commentImage = document.getElementById('commentImage');
+            if (commentImage) commentImage.value = '';
+            clearImagePreview('commentImageZone', 'commentImagePreview');
+        }
+    }
+
+    async function publishComment() {
+        if (USER_TYPE !== 'admin') return;
+        if (!selectedPostId) return;
+
+        const select = document.getElementById('commentCharacter');
+        const input = document.getElementById('commentText');
+        const imageInput = document.getElementById('commentImage');
+        if (!select || !input) return;
+
+        const characterId = select.value;
+        const text = input.value.trim();
+        const imageFile = imageInput?.files?.[0] ?? null;
+        if (!characterId || (!text && !imageFile)) {
+            alert('Selecciona personaje y agrega texto, imagen o ambos.');
+            return;
+        }
+
+        let image = '';
+        if (imageFile) image = await fileToDataURL(imageFile);
+
+        const posts = getPosts();
+        const index = posts.findIndex(item => item.id === selectedPostId);
+        if (index === -1) return;
+
+        const commentCharacter = findCharacter(characterId);
+        if (!commentCharacter) {
+            alert('No se encontró el perfil seleccionado para comentar.');
+            return;
+        }
+
+        if (!posts[index].dbId) {
+            const postCharacter = findCharacter(posts[index].characterId);
+            if (!postCharacter) {
+                alert('No se encontró el autor del post para guardarlo en base de datos.');
+                return;
+            }
+
+            try {
+                const postResult = await savePostInDatabase({
+                    text: posts[index].text || '',
+                    image: posts[index].image || '',
+                    character: {
+                        db_id: postCharacter.dbId ?? null,
+                        name: postCharacter.name,
+                        username: postCharacter.username,
+                        bio: postCharacter.bio,
+                        avatar: postCharacter.avatar,
+                        banner: postCharacter.banner,
+                    },
+                });
+                posts[index].dbId = postResult?.post?.id ?? null;
+            } catch (error) {
+                alert(error.message || 'No se pudo preparar el post en la base de datos para guardar comentarios.');
+                return;
+            }
+        }
+
+        let dbCommentId = null;
+        try {
+            const commentResult = await saveCommentInDatabase(posts[index].dbId, {
+                comment: text,
+                image,
+                character: {
+                    db_id: commentCharacter.dbId ?? null,
+                    name: commentCharacter.name,
+                    username: commentCharacter.username,
+                    bio: commentCharacter.bio,
+                    avatar: commentCharacter.avatar,
+                    banner: commentCharacter.banner,
+                },
+            });
+            dbCommentId = commentResult?.comment?.id ?? null;
+        } catch (error) {
+            alert(error.message || 'No se pudo guardar el comentario en la base de datos.');
+            return;
+        }
+
+        const commentsList = Array.isArray(posts[index].commentsList) ? [...posts[index].commentsList] : [];
+        commentsList.push({
+            id: dbCommentId ? `comment-db-${dbCommentId}` : `comment-${Date.now()}`,
+            dbId: dbCommentId,
+            characterId,
+            text,
+            image,
+            createdAt: Date.now(),
+        });
+
+        posts[index] = {
+            ...posts[index],
+            commentsList,
+            comments: commentsList.length,
+        };
+
+        setPosts(posts);
+        renderCommentsModal();
+        rerenderPostContexts();
     }
 
     function openPostModal() {
@@ -1068,22 +1683,205 @@
         zone.classList.add('has-preview');
     }
 
+    async function savePostInDatabase(payload) {
+        const response = await fetch('/social/posts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': CSRF_TOKEN,
+            },
+            body: JSON.stringify(payload),
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+            throw new Error(data?.message || 'No se pudo guardar el post en la base de datos.');
+        }
+
+        return data;
+    }
+
+    async function deletePostInDatabase(dbPostId) {
+        const response = await fetch(`/social/posts/${dbPostId}`, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': CSRF_TOKEN,
+            },
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+            throw new Error(data?.message || 'No se pudo eliminar el post en la base de datos.');
+        }
+    }
+
+    async function createProfileInDatabase(payload) {
+        const response = await fetch('/social/profiles', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': CSRF_TOKEN,
+            },
+            body: JSON.stringify(payload),
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+            throw new Error(data?.message || 'No se pudo crear el perfil en la base de datos.');
+        }
+
+        return data;
+    }
+
+    async function updateProfileInDatabase(dbProfileId, payload) {
+        const response = await fetch(`/social/profiles/${dbProfileId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': CSRF_TOKEN,
+            },
+            body: JSON.stringify(payload),
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+            throw new Error(data?.message || 'No se pudo actualizar el perfil en la base de datos.');
+        }
+
+        return data;
+    }
+
+    async function deleteProfileInDatabase(dbProfileId) {
+        const response = await fetch(`/social/profiles/${dbProfileId}`, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': CSRF_TOKEN,
+            },
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+            throw new Error(data?.message || 'No se pudo eliminar el perfil en la base de datos.');
+        }
+    }
+
+    async function saveCommentInDatabase(dbPostId, payload) {
+        const response = await fetch(`/social/posts/${dbPostId}/comments`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': CSRF_TOKEN,
+            },
+            body: JSON.stringify(payload),
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+            throw new Error(data?.message || 'No se pudo guardar el comentario en la base de datos.');
+        }
+
+        return data;
+    }
+
+    async function deleteCommentInDatabase(dbCommentId) {
+        const response = await fetch(`/social/comments/${dbCommentId}`, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': CSRF_TOKEN,
+            },
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+            throw new Error(data?.message || 'No se pudo eliminar el comentario en la base de datos.');
+        }
+    }
+
+    async function deleteComment(commentId) {
+        if (USER_TYPE !== 'admin') return;
+        if (!selectedPostId) return;
+        if (!confirm('¿Seguro que deseas eliminar este comentario?')) return;
+
+        const posts = getPosts();
+        const postIndex = posts.findIndex(item => item.id === selectedPostId);
+        if (postIndex === -1) return;
+
+        const commentsList = Array.isArray(posts[postIndex].commentsList) ? [...posts[postIndex].commentsList] : [];
+        const commentIndex = commentsList.findIndex(item => String(item.id) === String(commentId));
+        if (commentIndex === -1) return;
+
+        const targetComment = commentsList[commentIndex];
+        if (targetComment.dbId) {
+            try {
+                await deleteCommentInDatabase(targetComment.dbId);
+            } catch (error) {
+                alert(error.message || 'No se pudo eliminar el comentario en la base de datos.');
+                return;
+            }
+        }
+
+        commentsList.splice(commentIndex, 1);
+
+        posts[postIndex] = {
+            ...posts[postIndex],
+            commentsList,
+            comments: commentsList.length,
+        };
+
+        setPosts(posts);
+        renderCommentsModal();
+        rerenderPostContexts();
+    }
+
     async function publishPost() {
         if (USER_TYPE !== 'admin') return;
         const characterId = document.getElementById('postCharacter').value;
         const text = document.getElementById('postText').value.trim();
         const imageFile = document.getElementById('postImage').files[0];
+        const character = findCharacter(characterId);
 
         if (!text && !imageFile) {
             alert('Debes escribir texto o subir una imagen para publicar.');
             return;
         }
 
+        if (!character) {
+            alert('No se encontró el perfil seleccionado para publicar.');
+            return;
+        }
+
         let image = '';
         if (imageFile) image = await fileToDataURL(imageFile);
 
+        let dbPostId = null;
+        try {
+            const dbResult = await savePostInDatabase({
+                text,
+                image,
+                character: {
+                    db_id: character.dbId ?? null,
+                    name: character.name,
+                    username: character.username,
+                    bio: character.bio,
+                    avatar: character.avatar,
+                    banner: character.banner,
+                },
+            });
+            dbPostId = dbResult?.post?.id ?? null;
+        } catch (error) {
+            alert(error.message || 'No se pudo guardar el post en la base de datos.');
+            return;
+        }
+
         const posts = getPosts();
-        posts.push({ id: `post-${Date.now()}`, characterId, text, image, createdAt: Date.now(), likes: 0, comments: 0 });
+        posts.push({ id: `post-${Date.now()}`, dbId: dbPostId, characterId, text, image, createdAt: Date.now(), likes: 0, comments: 0, commentsList: [] });
         setPosts(posts);
         closePostModal();
         renderFeed();
@@ -1105,14 +1903,30 @@
         }
 
         const [avatar, banner] = await Promise.all([fileToDataURL(avatarFile), fileToDataURL(bannerFile)]);
+        let createdDbProfile = null;
+        try {
+            const dbResult = await createProfileInDatabase({
+                name,
+                username,
+                bio,
+                avatar,
+                banner,
+            });
+            createdDbProfile = dbResult?.profile ?? null;
+        } catch (error) {
+            alert(error.message || 'No se pudo crear el perfil en la base de datos.');
+            return;
+        }
+
         const chars = getCharacters();
         chars.push({
             id: `char-${Date.now()}`,
-            name,
-            username: username.startsWith('@') ? username : `@${username}`,
-            bio,
-            avatar,
-            banner,
+            dbId: createdDbProfile?.id ?? null,
+            name: createdDbProfile?.name ?? name,
+            username: createdDbProfile?.username ?? (username.startsWith('@') ? username : `@${username}`),
+            bio: createdDbProfile?.bio ?? bio,
+            avatar: createdDbProfile?.avatar ?? avatar,
+            banner: createdDbProfile?.banner ?? banner,
             followers: 0,
             following: 0,
             joined: new Date().toLocaleString('es-ES', { month: 'long', year: 'numeric' })
@@ -1148,10 +1962,27 @@
         if (avatarFile) avatar = await fileToDataURL(avatarFile);
         if (bannerFile) banner = await fileToDataURL(bannerFile);
 
+        const normalizedUsername = username.startsWith('@') ? username : `@${username}`;
+
+        if (chars[index].dbId) {
+            try {
+                await updateProfileInDatabase(chars[index].dbId, {
+                    name,
+                    username: normalizedUsername,
+                    bio,
+                    avatar,
+                    banner,
+                });
+            } catch (error) {
+                alert(error.message || 'No se pudo actualizar el perfil en la base de datos.');
+                return;
+            }
+        }
+
         chars[index] = {
             ...chars[index],
             name,
-            username: username.startsWith('@') ? username : `@${username}`,
+            username: normalizedUsername,
             bio,
             avatar,
             banner,
@@ -1165,9 +1996,21 @@
         openProfileDetail(chars[index].id);
     }
 
-    function deleteProfile() {
+    async function deleteProfile() {
         if (USER_TYPE !== 'admin' || !editingProfileId) return;
         if (!confirm('¿Seguro que deseas eliminar este perfil y sus publicaciones?')) return;
+
+        const targetCharacter = getCharacters().find(item => item.id === editingProfileId);
+        if (!targetCharacter) return;
+
+        if (targetCharacter.dbId) {
+            try {
+                await deleteProfileInDatabase(targetCharacter.dbId);
+            } catch (error) {
+                alert(error.message || 'No se pudo eliminar el perfil en la base de datos.');
+                return;
+            }
+        }
 
         const chars = getCharacters().filter(item => item.id !== editingProfileId);
         const posts = getPosts().filter(post => post.characterId !== editingProfileId);
@@ -1282,6 +2125,12 @@
             applyFloatingDefaults();
         } else if (event.data.type === 'openMaximized') {
             applyMaximizedDefaults();
+        }
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            closeImageViewer();
         }
     });
 

@@ -246,6 +246,156 @@
 		margin-top: 14px;
 	}
 
+	#libraryModal .chapter-item {
+		display: grid;
+		grid-template-columns: 1fr auto;
+		align-items: center;
+		gap: 10px;
+		padding: 14px 16px;
+		border: 2px solid #5a5250;
+		border-radius: 14px;
+		background: #E2D8CC;
+		margin-top: 10px;
+		cursor: pointer;
+	}
+
+	#libraryModal .chapter-item:hover {
+		background: #d8cec2;
+	}
+
+	#libraryModal .chapter-actions {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	#libraryModal .chapter-edit-btn {
+		border: none;
+		border-radius: 12px;
+		background: #443C3D;
+		color: #E2D8CC;
+		padding: 8px 14px;
+		font-weight: 700;
+		cursor: pointer;
+	}
+
+	#libraryModal .chapter-delete-btn {
+		border: none;
+		background: transparent;
+		color: #ff4a4a;
+		cursor: pointer;
+		font-size: 1.05rem;
+	}
+
+	#libraryModal .reader-shell {
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+	}
+
+	#libraryModal .reader-top {
+		display: grid;
+		grid-template-columns: auto 1fr auto;
+		align-items: center;
+		gap: 12px;
+		padding: 12px 16px;
+		border-bottom: 2px solid #5a5250;
+	}
+
+	#libraryModal .reader-title {
+		text-align: center;
+		font-weight: 800;
+	}
+
+	#libraryModal .reader-body {
+		flex: 1;
+		overflow: auto;
+		padding: 22px 24px;
+	}
+
+	#libraryModal .reader-layout {
+		flex: 1;
+		display: grid;
+		grid-template-columns: 1fr auto;
+		min-height: 0;
+		overflow: hidden;
+	}
+
+	#libraryModal .reader-main {
+		min-width: 0;
+		overflow: auto;
+	}
+
+	#libraryModal .reader-content {
+		font-size: 1.05rem;
+		line-height: 1.6;
+		border-top: 2px solid #c5b9ab;
+		padding-top: 16px;
+		margin-top: 10px;
+	}
+
+	#libraryModal .reader-bottom {
+		border-top: 2px solid #5a5250;
+		padding: 16px;
+		display: grid;
+		grid-template-columns: 1fr auto 1fr;
+		align-items: center;
+		gap: 12px;
+	}
+
+	#libraryModal .reader-nav-btn {
+		border: none;
+		border-radius: 14px;
+		padding: 12px 20px;
+		font-weight: 800;
+		background: #443C3D;
+		color: #E2D8CC;
+		cursor: pointer;
+	}
+
+	#libraryModal .reader-nav-btn[disabled] {
+		background: #c5b9ab;
+		color: #f2f2f2;
+		cursor: not-allowed;
+	}
+
+	#libraryModal .reader-caps {
+		width: 0;
+		overflow: hidden;
+		border-left: 0 solid #5a5250;
+		background: #443C3D;
+		padding: 0;
+		transition: width 0.2s ease, border-left-width 0.2s ease, padding 0.2s ease;
+	}
+
+	#libraryModal .reader-caps.active {
+		width: 300px;
+		border-left-width: 2px;
+		padding: 12px;
+	}
+
+	#libraryModal .reader-cap-btn {
+		width: 100%;
+		text-align: left;
+		border: 2px solid #5a5250;
+		border-radius: 10px;
+		background: #E2D8CC;
+		padding: 10px 12px;
+		font-weight: 700;
+		margin-top: 8px;
+		cursor: pointer;
+	}
+
+	#libraryModal .reader-cap-btn.active {
+		background: #D0C4B4;
+	}
+
+	#libraryModal .reader-caps-title {
+		font-size: 1.2rem;
+		font-weight: 800;
+		margin-bottom: 4px;
+	}
+
 	#libraryModal .modal-backdrop {
 		position: fixed;
 		inset: 0;
@@ -473,10 +623,14 @@
 	function getLibraryBooks() {
 		const raw = localStorage.getItem(LIBRARY_STORAGE_KEY);
 		if (!raw) {
-			localStorage.setItem(LIBRARY_STORAGE_KEY, JSON.stringify(defaultLibraryBooks));
-			return [...defaultLibraryBooks];
+			const normalizedDefaults = normalizeLibraryBooks(defaultLibraryBooks);
+			localStorage.setItem(LIBRARY_STORAGE_KEY, JSON.stringify(normalizedDefaults));
+			return normalizedDefaults;
 		}
-		return JSON.parse(raw);
+
+		const parsed = normalizeLibraryBooks(JSON.parse(raw));
+		localStorage.setItem(LIBRARY_STORAGE_KEY, JSON.stringify(parsed));
+		return parsed;
 	}
 
 	function setLibraryBooks(items) {
@@ -490,6 +644,29 @@
 			.replaceAll('>', '&gt;')
 			.replaceAll('"', '&quot;')
 			.replaceAll("'", '&#39;');
+	}
+
+	function getBookChapters(book) {
+		return Array.isArray(book?.chapters) ? book.chapters : [];
+	}
+
+	function normalizeLibraryBooks(items) {
+		if (!Array.isArray(items)) return [];
+		return items.map(item => {
+			const chapters = Array.isArray(item?.chapters) ? item.chapters : [];
+			const safeTotal = Math.max(1, Number(item?.totalChapters || chapters.length || 1));
+			const safeCurrent = Math.max(0, Math.min(safeTotal, Number(item?.currentChapter || 0)));
+			return {
+				...item,
+				chapters,
+				totalChapters: safeTotal,
+				currentChapter: safeCurrent,
+			};
+		});
+	}
+
+	function libraryIsAdmin() {
+		return LIBRARY_USER_ROLE === 'admin';
 	}
 
 	function libraryProgressPercent(book) {
@@ -532,6 +709,8 @@
 
 		libraryCurrentBookId = bookId;
 		const progress = libraryProgressPercent(book);
+		const chapters = getReadableChapters(book);
+		const canManageChapters = libraryIsAdmin();
 		const body = document.getElementById('libraryBody');
 		body.innerHTML = `
 			<div class="library-toolbar" style="padding:14px 20px;">
@@ -574,20 +753,195 @@
 					<h3 style="font-size:2rem; font-weight:800; margin-bottom:8px;">Sinopsis</h3>
 					<div>${escapeLibraryHtml(book.synopsis || 'Sin descripción aún.')}</div>
 				</div>
+
+				<div class="card-block">
+					<h3 style="font-size:2rem; font-weight:800; margin-bottom:8px;">Capítulos (${chapters.length})</h3>
+					${chapters.length === 0
+						? '<div class="muted">Este libro aún no tiene capítulos guardados.</div>'
+						: chapters.map((chapter, index) => `
+							<div class="chapter-item" onclick="openLibraryReader('${book.id}', ${index + 1})">
+								<div style="font-size:1.5rem; font-weight:700;"><i class="fa-solid fa-chevron-right" style="font-size:0.95rem; margin-right:8px;"></i>Cap. ${index + 1}: ${escapeLibraryHtml(chapter.title || `Capítulo ${index + 1}`)}</div>
+								<div class="chapter-actions">
+									${!String(chapter.id || '').startsWith('fallback-')
+										? `<button type="button" class="chapter-edit-btn" onclick="event.stopPropagation(); openChapterInEditor('${book.id}', '${chapter.id}')"><i class="fa-solid fa-pen"></i> Editar</button>`
+										: ''}
+									${canManageChapters && !String(chapter.id || '').startsWith('fallback-')
+										? `<button type="button" class="chapter-delete-btn" onclick="event.stopPropagation(); deleteLibraryChapter('${book.id}', '${chapter.id}')"><i class="fa-solid fa-trash"></i></button>`
+										: ''}
+								</div>
+							</div>
+						`).join('')}
+				</div>
+			</div>
+		`;
+	}
+
+	function openChapterInEditor(bookId, chapterId) {
+		const books = getLibraryBooks();
+		const book = books.find(item => item.id === bookId);
+		if (!book) return;
+
+		const chapter = getBookChapters(book).find(item => item.id === chapterId);
+		if (!chapter) {
+			alert('Capítulo no encontrado.');
+			return;
+		}
+
+		if (typeof window.openTextEditor === 'function') {
+			window.openTextEditor();
+			window.postMessage({
+				app: 'editor',
+				type: 'openChapter',
+				bookId,
+				chapterId,
+				chapterTitle: chapter.title || '',
+				content: chapter.content || '',
+			}, '*');
+			return;
+		}
+
+		const editorUrl = new URL('/text-editor', window.location.origin);
+		editorUrl.searchParams.set('bookId', bookId);
+		editorUrl.searchParams.set('chapterId', chapterId);
+		window.location.href = editorUrl.toString();
+	}
+
+	function deleteLibraryChapter(bookId, chapterId) {
+		if (!libraryIsAdmin()) return;
+		if (!confirm('¿Eliminar este capítulo?')) return;
+
+		const books = getLibraryBooks();
+		const index = books.findIndex(item => item.id === bookId);
+		if (index === -1) return;
+
+		const currentChapters = getBookChapters(books[index]);
+		const nextChapters = currentChapters.filter(item => item.id !== chapterId);
+		const nextTotal = Math.max(1, nextChapters.length);
+
+		books[index] = {
+			...books[index],
+			chapters: nextChapters,
+			totalChapters: nextTotal,
+			currentChapter: Math.max(0, Math.min(Number(books[index].currentChapter || 0), nextTotal)),
+		};
+
+		setLibraryBooks(books);
+		openLibraryDetail(bookId);
+	}
+
+	function getReadableChapters(book) {
+		const chapters = getBookChapters(book);
+		if (chapters.length > 0) return chapters;
+
+		const fallbackTotal = Math.max(1, Number(book.totalChapters || 1));
+		return Array.from({ length: fallbackTotal }, (_, index) => ({
+			id: `fallback-${book.id}-${index + 1}`,
+			title: `Capítulo ${index + 1}`,
+			content: '',
+		}));
+	}
+
+	function updateBookCurrentChapter(bookId, chapterNumber) {
+		const books = getLibraryBooks();
+		const index = books.findIndex(item => item.id === bookId);
+		if (index === -1) return;
+
+		const chaptersLen = getReadableChapters(books[index]).length;
+		books[index] = {
+			...books[index],
+			totalChapters: Math.max(1, chaptersLen),
+			currentChapter: Math.max(1, Math.min(chaptersLen, chapterNumber)),
+		};
+
+		setLibraryBooks(books);
+	}
+
+	function toggleReaderCaps() {
+		const panel = document.getElementById('libraryReaderCaps');
+		if (!panel) return;
+		panel.classList.toggle('active');
+	}
+
+	function openLibraryReader(bookId, chapterNumber = null) {
+		const books = getLibraryBooks();
+		const book = books.find(item => item.id === bookId);
+		if (!book) return;
+
+		const chapters = getReadableChapters(book);
+		const fallbackCurrent = Number(book.currentChapter || 0) > 0 ? Number(book.currentChapter) : 1;
+		const requested = Number(chapterNumber || fallbackCurrent || 1);
+		const safeChapterNumber = Math.max(1, Math.min(chapters.length, requested));
+		const chapterIndex = safeChapterNumber - 1;
+		const chapter = chapters[chapterIndex] || chapters[0];
+		const body = document.getElementById('libraryBody');
+
+		updateBookCurrentChapter(bookId, safeChapterNumber);
+
+		body.innerHTML = `
+			<div class="reader-shell">
+				<div class="reader-top">
+					<button type="button" class="ghost-btn" onclick="openLibraryDetail('${book.id}')"><i class="fa-solid fa-arrow-left"></i> Cerrar</button>
+					<div class="reader-title">
+						<div style="font-size:1.1rem;">
+						${escapeLibraryHtml(book.title)}
+							<span class="muted">Cap. ${safeChapterNumber}: ${escapeLibraryHtml(chapter.title || `Capítulo ${safeChapterNumber}`)}</span>
+						</div>
+					</div>
+					<div style="display:flex; gap:8px; justify-content:flex-end;">
+						${libraryIsAdmin()
+							? `<button type="button" class="chapter-edit-btn" onclick="openChapterInEditor('${book.id}', '${chapter.id}')"><i class="fa-solid fa-pen"></i> Editar capítulo</button>`
+							: ''}
+						<button type="button" class="primary-btn" style="background:#b7986a;" onclick="toggleReaderCaps()"><i class="fa-solid fa-list"></i> Caps</button>
+					</div>
+				</div>
+
+				<div class="reader-layout">
+					<div class="reader-main">
+						<div class="reader-body">
+							<h2 style="font-size:2rem; font-weight:800; margin:0;">Capítulo ${safeChapterNumber}: ${escapeLibraryHtml(chapter.title || `Capítulo ${safeChapterNumber}`)}</h2>
+							<div class="reader-content">${chapter.content || '<span class="muted">Este capítulo no tiene contenido aún.</span>'}</div>
+						</div>
+					</div>
+
+					<div id="libraryReaderCaps" class="reader-caps">
+						<div class="reader-caps-title">Capítulos (${chapters.length})</div>
+						${chapters.map((item, index) => `
+							<button type="button" class="reader-cap-btn ${index + 1 === safeChapterNumber ? 'active' : ''}" onclick="openLibraryReader('${book.id}', ${index + 1})">
+								Cap. ${index + 1}: ${escapeLibraryHtml(item.title || `Capítulo ${index + 1}`)}
+							</button>
+						`).join('')}
+					</div>
+				</div>
+
+				<div class="reader-bottom">
+					<div>
+						<button type="button" class="reader-nav-btn" ${safeChapterNumber <= 1 ? 'disabled' : ''} onclick="openLibraryReader('${book.id}', ${safeChapterNumber - 1})"><i class="fa-solid fa-chevron-left"></i> Anterior</button>
+					</div>
+					<div style="font-size:1.8rem; font-weight:800; text-align:center;">${safeChapterNumber} / ${chapters.length}</div>
+					<div style="text-align:right;">
+						<button type="button" class="reader-nav-btn" ${safeChapterNumber >= chapters.length ? 'disabled' : ''} onclick="openLibraryReader('${book.id}', ${safeChapterNumber + 1})">Siguiente <i class="fa-solid fa-chevron-right"></i></button>
+					</div>
+				</div>
 			</div>
 		`;
 	}
 
 	function startReading(bookId) {
 		const books = getLibraryBooks();
-		const index = books.findIndex(item => item.id === bookId);
-		if (index === -1) return;
+		const book = books.find(item => item.id === bookId);
+		if (!book) return;
 
-		const total = Math.max(1, Number(books[index].totalChapters || 1));
-		const current = Math.max(0, Number(books[index].currentChapter || 0));
-		books[index].currentChapter = Math.min(total, current + 1);
-		setLibraryBooks(books);
-		openLibraryDetail(bookId);
+		const chapters = getReadableChapters(book);
+		if (chapters.length === 0) {
+			alert('Este libro no tiene capítulos para leer aún.');
+			return;
+		}
+
+		const startChapter = Number(book.currentChapter || 0) > 0
+			? Number(book.currentChapter)
+			: 1;
+
+		openLibraryReader(bookId, startChapter);
 	}
 
 	function triggerLibraryFileInput() {
@@ -714,6 +1068,7 @@
 			totalChapters: 1,
 			currentChapter: 0,
 			cover,
+			chapters: [],
 		});
 
 		setLibraryBooks(books);

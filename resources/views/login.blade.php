@@ -104,6 +104,12 @@
             <form action="{{ route('admin.login') }}" method="POST" class="space-y-6">
                 @csrf
 
+                @if($errors->has('credentials'))
+                    <div class="rounded-xl border-2 border-red-600 bg-red-100 text-red-700 px-4 py-3 text-sm">
+                        {{ $errors->first('credentials') }}
+                    </div>
+                @endif
+
                 <!-- Usuario Field -->
                 <div>
                     <label for="username" class="form-label block mb-2 text-sm">Usuario</label>
@@ -111,7 +117,8 @@
                         type="text" 
                         id="username" 
                         name="username" 
-                        placeholder="ADMIN" 
+                        placeholder="Nabb" 
+                        value="{{ old('username') }}"
                         class="form-input w-full py-3 px-4 rounded-xl transition duration-200"
                         required
                     >

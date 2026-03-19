@@ -606,6 +606,45 @@
         localStorage.setItem(LIBRARY_STORAGE_KEY_EDITOR, JSON.stringify(items));
     }
 
+    function findChapterInBooks(bookId, chapterId) {
+        const books = getEditorLibraryBooks();
+        const book = books.find(item => item.id === bookId);
+        if (!book) return null;
+        const chapters = Array.isArray(book.chapters) ? book.chapters : [];
+        const chapter = chapters.find(item => item.id === chapterId);
+        if (!chapter) return null;
+
+        return { book, chapter };
+    }
+
+    function openChapterInEditorContent({ bookId, chapterId, chapterTitle = '', content = '' }) {
+        const editor = document.getElementById('editorRichContent');
+        if (!editor) return;
+
+        let htmlToLoad = content || '';
+        if (!htmlToLoad && bookId && chapterId) {
+            const found = findChapterInBooks(bookId, chapterId);
+            htmlToLoad = found?.chapter?.content || '';
+            if (!chapterTitle) {
+                chapterTitle = found?.chapter?.title || '';
+            }
+        }
+
+        if (!htmlToLoad) {
+            alert('No se encontró contenido para este capítulo.');
+            return;
+        }
+
+        editor.innerHTML = htmlToLoad;
+        editor.focus();
+        localStorage.setItem(EDITOR_NOTE_FALLBACK_KEY, htmlToLoad);
+
+        const titleNode = document.querySelector('#editorModal .editor-header-title span');
+        if (titleNode && chapterTitle) {
+            titleNode.textContent = `Editor de Texto · ${chapterTitle}`;
+        }
+    }
+
     function renderSaveFolders() {
         const data = getEditorFilesData();
         const wrap = document.getElementById('saveFoldersGrid');
@@ -1005,12 +1044,25 @@
             openEditorFloating();
         } else if (event.data.type === 'openMaximized') {
             openEditorMaximized();
+        } else if (event.data.type === 'openChapter') {
+            openChapterInEditorContent(event.data);
         }
     });
 
     window.addEventListener('resize', clampEditorIntoViewport);
 
     window.addEventListener('load', () => {
+        const params = new URLSearchParams(window.location.search);
+        const queryBookId = params.get('bookId');
+        const queryChapterId = params.get('chapterId');
+        if (queryBookId && queryChapterId) {
+            openChapterInEditorContent({
+                bookId: queryBookId,
+                chapterId: queryChapterId,
+            });
+            return;
+        }
+
         const savedNote = localStorage.getItem(EDITOR_NOTE_FALLBACK_KEY);
         if (savedNote) {
             document.getElementById('editorRichContent').innerHTML = savedNote;

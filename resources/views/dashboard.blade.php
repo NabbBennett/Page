@@ -35,6 +35,10 @@
                 background-position: center;
             }
 
+            body.dark-mode.dashboard-bg {
+                background: #1C1819;
+            }
+
             .sidebar-item {
                 display: flex;
                 flex-direction: column;
@@ -161,7 +165,7 @@
                 color: white;
             }
 
-            .trash-icon {
+            .theme-toggle-icon {
                 position: fixed;
                 bottom: 6rem;
                 right: 2rem;
@@ -176,14 +180,164 @@
                 transition: background-color 0.2s;
             }
 
-            .trash-icon:hover {
+            .theme-toggle-icon:hover {
                 background-color: rgba(255, 255, 255, 0.2);
             }
 
-            .trash-icon svg {
-                width: 28px;
-                height: 28px;
+            .theme-toggle-icon i {
+                font-size: 1.35rem;
                 color: white;
+            }
+
+            body.dark-mode .theme-toggle-icon {
+                background-color: #272022;
+            }
+
+            body.dark-mode .bottom-bar {
+                background-color: #1C1819;
+            }
+
+            body.dark-mode .menu-popup {
+                background-color: #272022;
+            }
+
+            body.dark-mode .menu-header {
+                background-color: #1C1819;
+                color: #E2D8CC;
+                border-bottom-color: #B59B79;
+            }
+
+            body.dark-mode .menu-item {
+                color: #E2D8CC;
+                border-bottom-color: #B59B79;
+            }
+
+            body.dark-mode .menu-item:hover {
+                background-color: #443C3D;
+                color: #E2D8CC;
+            }
+
+            body.dark-mode #editorModal .text-editor-window,
+            body.dark-mode #socialModal .app-window,
+            body.dark-mode #libraryModal .library-window,
+            body.dark-mode #filesModal .files-window {
+                background: #1C1819 !important;
+                color: #E2D8CC !important;
+                border-color: #B59B79 !important;
+            }
+
+            body.dark-mode #editorModal .editor-header,
+            body.dark-mode #socialModal .window-header,
+            body.dark-mode #libraryModal .window-header,
+            body.dark-mode #filesModal .window-header {
+                background: #B59B79 !important;
+                color: #1C1819 !important;
+                border-bottom: 1px solid #B59B79 !important;
+            }
+
+            body.dark-mode #editorModal .editor-btn,
+            body.dark-mode #socialModal .window-btn,
+            body.dark-mode #libraryModal .window-btn,
+            body.dark-mode #filesModal .window-btn {
+                color: #1C1819 !important;
+            }
+
+            body.dark-mode #editorModal .editor-toolbar,
+            body.dark-mode #editorModal .te-bottom-bar,
+            body.dark-mode #socialModal .left-menu,
+            body.dark-mode #socialModal .post-actions,
+            body.dark-mode #socialModal .tabs,
+            body.dark-mode #libraryModal .library-toolbar,
+            body.dark-mode #filesModal .top-bar,
+            body.dark-mode #filesModal .folder-files-list,
+            body.dark-mode #filesModal .remove-file-list {
+                background: #1C1819 !important;
+                color: #E2D8CC !important;
+                border-color: #B59B79 !important;
+            }
+
+            body.dark-mode #socialModal .card,
+            body.dark-mode #socialModal .profile-row,
+            body.dark-mode #socialModal .comment-item,
+            body.dark-mode #libraryModal .card-block,
+            body.dark-mode #libraryModal .chapter-item,
+            body.dark-mode #libraryModal .progress-box,
+            body.dark-mode #libraryModal .reader-caps,
+            body.dark-mode #filesModal .folder-card,
+            body.dark-mode #filesModal .file-row,
+            body.dark-mode #editorModal .save-modal,
+            body.dark-mode #socialModal .modal-box,
+            body.dark-mode #libraryModal .modal-box,
+            body.dark-mode #filesModal .modal-box {
+                background: #272022 !important;
+                color: #E2D8CC !important;
+                border-color: #B59B79 !important;
+            }
+
+            body.dark-mode #socialModal .primary-btn,
+            body.dark-mode #socialModal .ghost-btn,
+            body.dark-mode #socialModal .danger-btn,
+            body.dark-mode #libraryModal .primary-btn,
+            body.dark-mode #libraryModal .ghost-btn,
+            body.dark-mode #libraryModal .danger-btn,
+            body.dark-mode #libraryModal .chapter-edit-btn,
+            body.dark-mode #libraryModal .reader-nav-btn,
+            body.dark-mode #filesModal .primary-btn,
+            body.dark-mode #filesModal .ghost-btn,
+            body.dark-mode #filesModal .danger-btn,
+            body.dark-mode #filesModal .danger-soft-btn,
+            body.dark-mode #editorModal .notes-btn,
+            body.dark-mode #editorModal .new-btn,
+            body.dark-mode #editorModal .save-btn,
+            body.dark-mode #editorModal .save-cancel-btn,
+            body.dark-mode #editorModal .save-confirm-btn {
+                background: #272022 !important;
+                color: #E2D8CC !important;
+                border-color: #B59B79 !important;
+            }
+
+            body.dark-mode #socialModal .post-action-btn,
+            body.dark-mode #editorModal .toolbar-btn,
+            body.dark-mode #editorModal .save-segmented-btn,
+            body.dark-mode #filesModal .icon-btn,
+            body.dark-mode #filesModal .badge {
+                background: #272022 !important;
+                color: #E2D8CC !important;
+                border-color: #B59B79 !important;
+            }
+
+            body.dark-mode #socialModal .input,
+            body.dark-mode #socialModal .textarea,
+            body.dark-mode #socialModal .select,
+            body.dark-mode #libraryModal .input,
+            body.dark-mode #libraryModal .textarea,
+            body.dark-mode #libraryModal .select,
+            body.dark-mode #filesModal .input,
+            body.dark-mode #filesModal .search-input,
+            body.dark-mode #filesModal .select,
+            body.dark-mode #editorModal .save-input,
+            body.dark-mode #editorModal .editor-rich {
+                background: #272022 !important;
+                color: #E2D8CC !important;
+                border-color: #B59B79 !important;
+            }
+
+            body.dark-mode .taskbar-tab.current,
+            body.dark-mode #socialModal .menu-item.active,
+            body.dark-mode #socialModal .tabs button.active,
+            body.dark-mode #libraryModal .reader-cap-btn.active,
+            body.dark-mode #filesModal .folder-card:hover {
+                background: #B59B79 !important;
+                color: #1C1819 !important;
+                border-color: #B59B79 !important;
+            }
+
+            body.dark-mode #socialModal .muted,
+            body.dark-mode #libraryModal .muted,
+            body.dark-mode #filesModal .muted,
+            body.dark-mode #editorModal .save-muted {
+                color: #E2D8CC !important;
+                opacity: 0.8;
             }
 
             .menu-popup {
@@ -207,7 +361,8 @@
             .menu-header {
                 padding: 1rem;
                 border-bottom: 1px solid #d0c4b4;
-                color: #443C3D;
+                color: #d0c4b4;
+                background-color: #443C3D;
                 font-weight: 700;
             }
 
@@ -297,11 +452,9 @@
             </svg>
         </div>
 
-        <!-- Papelera Icon (Bottom Right) -->
-        <div class="trash-icon">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
+        <!-- Theme Toggle Icon (Bottom Right) -->
+        <div class="theme-toggle-icon" onclick="toggleDarkMode()" title="Modo oscuro">
+            <i id="themeToggleIcon" class="fa-solid fa-moon"></i>
         </div>
 
         <!-- Main Content -->
@@ -437,6 +590,31 @@
         </div>
 
         <script>
+            const DASHBOARD_THEME_KEY = 'dashboard_theme_v1';
+
+            function applyDashboardTheme(mode) {
+                const isDark = mode === 'dark';
+                document.body.classList.toggle('dark-mode', isDark);
+
+                const icon = document.getElementById('themeToggleIcon');
+                if (icon) {
+                    icon.classList.remove('fa-moon', 'fa-sun');
+                    icon.classList.add(isDark ? 'fa-sun' : 'fa-moon');
+                }
+            }
+
+            function toggleDarkMode() {
+                const isDark = document.body.classList.contains('dark-mode');
+                const nextMode = isDark ? 'light' : 'dark';
+                applyDashboardTheme(nextMode);
+                localStorage.setItem(DASHBOARD_THEME_KEY, nextMode);
+            }
+
+            function initDashboardTheme() {
+                const saved = localStorage.getItem(DASHBOARD_THEME_KEY);
+                applyDashboardTheme(saved === 'dark' ? 'dark' : 'light');
+            }
+
             function setCurrentTab(app) {
                 const editorBottomTab = document.getElementById('editorBottomTab');
                 const socialBottomTab = document.getElementById('socialBottomTab');
@@ -494,18 +672,40 @@
                 const filesModal = document.getElementById('filesModal');
                 const modals = [editorModal, socialModal, libraryModal, filesModal];
 
-                let z = 1001;
-                modals
-                    .filter(modal => modal.id !== modalId)
-                    .forEach(modal => {
-                        modal.style.zIndex = String(z);
-                        z += 1;
-                    });
+                const visibleOthers = modals
+                    .filter(modal => modal && modal.id !== modalId && modal.style.display !== 'none')
+                    .sort((a, b) => Number(a.style.zIndex || 0) - Number(b.style.zIndex || 0));
+
+                let z = 1000;
+                visibleOthers.forEach(modal => {
+                    modal.style.zIndex = String(z);
+                    z += 1;
+                });
 
                 const activeModal = document.getElementById(modalId);
                 if (activeModal) {
-                    activeModal.style.zIndex = '1003';
+                    activeModal.style.zIndex = String(z + 1);
                 }
+            }
+
+            function setupFloatingWindowFocus() {
+                const mapping = [
+                    { id: 'editorModal', app: 'editor' },
+                    { id: 'socialModal', app: 'social' },
+                    { id: 'libraryModal', app: 'library' },
+                    { id: 'filesModal', app: 'files' },
+                ];
+
+                mapping.forEach(({ id, app }) => {
+                    const modal = document.getElementById(id);
+                    if (!modal) return;
+
+                    modal.addEventListener('mousedown', () => {
+                        if (modal.style.display === 'none') return;
+                        bringToFront(id);
+                        setCurrentTab(app);
+                    });
+                });
             }
 
             function setWindowedLayout(modal) {
@@ -765,6 +965,9 @@
                     window.ArchivosApp.openFloating();
                 }
             }
+
+            initDashboardTheme();
+            setupFloatingWindowFocus();
 
             function logout() {
                 // Transición de pantalla negra
