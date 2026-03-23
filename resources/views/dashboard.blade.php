@@ -121,6 +121,10 @@
                 background-color: rgba(190, 176, 160, 0.26);
             }
 
+            .taskbar-tab.music {
+                background-color: rgba(181, 155, 121, 0.24);
+            }
+
             .user-badge {
                 background-color: rgba(181, 155, 121, 0.4);
                 border: 1px solid rgba(181, 155, 121, 0.8);
@@ -166,18 +170,16 @@
             }
 
             .theme-toggle-icon {
-                position: fixed;
-                bottom: 6rem;
-                right: 2rem;
                 background-color: rgba(255, 255, 255, 0.1);
                 border-radius: 50%;
-                width: 50px;
-                height: 50px;
-                display: flex;
+                width: 40px;
+                height: 40px;
+                display: inline-flex;
                 align-items: center;
                 justify-content: center;
                 cursor: pointer;
                 transition: background-color 0.2s;
+                flex-shrink: 0;
             }
 
             .theme-toggle-icon:hover {
@@ -442,6 +444,41 @@
                 z-index: 1000;
                 pointer-events: none;
             }
+
+            .music-mini {
+                position: fixed;
+                right: 1.4rem;
+                bottom: 5rem;
+                width: 340px;
+                background: rgba(9, 11, 15, 0.95);
+                border: 1px solid rgba(255, 255, 255, 0.16);
+                border-radius: 0.85rem;
+                color: #f8f9fb;
+                display: none;
+                align-items: center;
+                gap: 0.8rem;
+                padding: 0.55rem 0.75rem;
+                z-index: 1300;
+                box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+            }
+
+            .music-mini.visible {
+                display: flex;
+            }
+
+            .music-mini-cover {
+                width: 44px;
+                height: 44px;
+                border-radius: 0.45rem;
+                background: linear-gradient(135deg, #c8abc7, #6f81cf);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #1a1c28;
+                font-size: 1.2rem;
+                flex-shrink: 0;
+            }
+
         </style>
     </head>
     <body class="dashboard-bg min-h-screen flex flex-col">
@@ -450,11 +487,6 @@
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
-        </div>
-
-        <!-- Theme Toggle Icon (Bottom Right) -->
-        <div class="theme-toggle-icon" onclick="toggleDarkMode()" title="Modo oscuro">
-            <i id="themeToggleIcon" class="fa-solid fa-moon"></i>
         </div>
 
         <!-- Main Content -->
@@ -501,6 +533,12 @@
 
             <!-- Right Sidebar -->
             <div class="w-24 pt-8 pb-32 px-4 flex flex-col gap-12 items-center">
+                <div class="sidebar-item mt-auto" onclick="openMusicWindow()">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-2v13M9 19a2 2 0 11-4 0 2 2 0 014 0zm12-2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    <span>Música</span>
+                </div>
             </div>
         </div>
 
@@ -530,6 +568,10 @@
                     <i class="fas fa-folder"></i>
                     <span>Archivos</span>
                 </div>
+                <div id="musicBottomTab" class="taskbar-tab music" onclick="restoreMusicFromTaskbar()">
+                    <i class="fas fa-music"></i>
+                    <span>Música</span>
+                </div>
             </div>
 
             <!-- Menu Popup -->
@@ -556,6 +598,9 @@
                 <div class="text-sm" id="timeDisplay">
                     <div id="timeHour">00:00</div>
                     <div id="timeDate">00 Mon</div>
+                </div>
+                <div class="theme-toggle-icon" onclick="toggleDarkMode()" title="Modo oscuro">
+                    <i id="themeToggleIcon" class="fa-solid fa-moon"></i>
                 </div>
             </div>
         </div>
@@ -589,6 +634,24 @@
             @include('partials.archivos', ['userType' => $userType])
         </div>
 
+        <div id="musicModal" class="floating-app" style="z-index: 998;">
+            @include('partials.music', ['userType' => $userType])
+        </div>
+
+        <div id="musicMiniPlayer" class="music-mini" onclick="restoreMusicFromMini(event)">
+            <div class="music-mini-cover"><i class="fas fa-music"></i></div>
+            <div class="min-w-0 flex-1">
+                <div class="font-semibold truncate">Soft Spot</div>
+                <div class="text-xs text-gray-400 truncate">Piri & Tommy Villiers</div>
+            </div>
+            <div class="flex items-center gap-3 text-sm">
+                <button onclick="event.stopPropagation()">⏮</button>
+                <button onclick="event.stopPropagation()" class="w-8 h-8 rounded-full bg-gray-100 text-black">▶</button>
+                <button onclick="event.stopPropagation()">⏭</button>
+                <button onclick="event.stopPropagation(); closeMusicWindow()">×</button>
+            </div>
+        </div>
+
         <script>
             const DASHBOARD_THEME_KEY = 'dashboard_theme_v1';
 
@@ -620,10 +683,12 @@
                 const socialBottomTab = document.getElementById('socialBottomTab');
                 const libraryBottomTab = document.getElementById('libraryBottomTab');
                 const filesBottomTab = document.getElementById('filesBottomTab');
+                const musicBottomTab = document.getElementById('musicBottomTab');
                 editorBottomTab.classList.remove('current');
                 socialBottomTab.classList.remove('current');
                 libraryBottomTab.classList.remove('current');
                 filesBottomTab.classList.remove('current');
+                musicBottomTab.classList.remove('current');
 
                 if (app === 'editor' && editorBottomTab.classList.contains('active')) {
                     editorBottomTab.classList.add('current');
@@ -637,6 +702,9 @@
                 if (app === 'files' && filesBottomTab.classList.contains('active')) {
                     filesBottomTab.classList.add('current');
                 }
+                if (app === 'music' && musicBottomTab.classList.contains('active')) {
+                    musicBottomTab.classList.add('current');
+                }
             }
 
             function setFallbackCurrentTab() {
@@ -644,16 +712,19 @@
                 const socialModal = document.getElementById('socialModal');
                 const libraryModal = document.getElementById('libraryModal');
                 const filesModal = document.getElementById('filesModal');
-                const editorVisible = editorModal.style.display !== 'none';
-                const socialVisible = socialModal.style.display !== 'none';
-                const libraryVisible = libraryModal.style.display !== 'none';
-                const filesVisible = filesModal.style.display !== 'none';
+                const musicModal = document.getElementById('musicModal');
+                const editorVisible = isModalVisible(editorModal);
+                const socialVisible = isModalVisible(socialModal);
+                const libraryVisible = isModalVisible(libraryModal);
+                const filesVisible = isModalVisible(filesModal);
+                const musicVisible = isModalVisible(musicModal);
 
                 const visible = [];
                 if (editorVisible) visible.push({ app: 'editor', id: 'editorModal', z: Number(editorModal.style.zIndex || 0) });
                 if (socialVisible) visible.push({ app: 'social', id: 'socialModal', z: Number(socialModal.style.zIndex || 0) });
                 if (libraryVisible) visible.push({ app: 'library', id: 'libraryModal', z: Number(libraryModal.style.zIndex || 0) });
                 if (filesVisible) visible.push({ app: 'files', id: 'filesModal', z: Number(filesModal.style.zIndex || 0) });
+                if (musicVisible) visible.push({ app: 'music', id: 'musicModal', z: Number(musicModal.style.zIndex || 0) });
 
                 if (visible.length === 0) {
                     setCurrentTab('none');
@@ -670,10 +741,11 @@
                 const socialModal = document.getElementById('socialModal');
                 const libraryModal = document.getElementById('libraryModal');
                 const filesModal = document.getElementById('filesModal');
-                const modals = [editorModal, socialModal, libraryModal, filesModal];
+                const musicModal = document.getElementById('musicModal');
+                const modals = [editorModal, socialModal, libraryModal, filesModal, musicModal];
 
                 const visibleOthers = modals
-                    .filter(modal => modal && modal.id !== modalId && modal.style.display !== 'none')
+                    .filter(modal => modal && modal.id !== modalId && isModalVisible(modal))
                     .sort((a, b) => Number(a.style.zIndex || 0) - Number(b.style.zIndex || 0));
 
                 let z = 1000;
@@ -694,6 +766,7 @@
                     { id: 'socialModal', app: 'social' },
                     { id: 'libraryModal', app: 'library' },
                     { id: 'filesModal', app: 'files' },
+                    { id: 'musicModal', app: 'music' },
                 ];
 
                 mapping.forEach(({ id, app }) => {
@@ -701,11 +774,15 @@
                     if (!modal) return;
 
                     modal.addEventListener('mousedown', () => {
-                        if (modal.style.display === 'none') return;
+                        if (!isModalVisible(modal)) return;
                         bringToFront(id);
                         setCurrentTab(app);
                     });
                 });
+            }
+
+            function isModalVisible(modal) {
+                return !!modal && window.getComputedStyle(modal).display !== 'none';
             }
 
             function setWindowedLayout(modal) {
@@ -810,6 +887,9 @@
                 const libraryBottomTab = document.getElementById('libraryBottomTab');
                 const filesModal = document.getElementById('filesModal');
                 const filesBottomTab = document.getElementById('filesBottomTab');
+                const musicModal = document.getElementById('musicModal');
+                const musicBottomTab = document.getElementById('musicBottomTab');
+                const musicMiniPlayer = document.getElementById('musicMiniPlayer');
 
                 if (!event.data || !event.data.type) return;
 
@@ -881,6 +961,34 @@
                     } else if (event.data.type === 'focus') {
                         bringToFront('filesModal');
                         setCurrentTab('files');
+                    }
+                    return;
+                }
+
+                if (event.data.app === 'music') {
+                    if (event.data.type === 'minimize') {
+                        musicModal.style.display = 'none';
+                        musicBottomTab.classList.add('active');
+                        musicMiniPlayer.classList.add('visible');
+                        setCurrentTab('music');
+                    } else if (event.data.type === 'maximize') {
+                        setMaxLayout(musicModal);
+                        bringToFront('musicModal');
+                        musicMiniPlayer.classList.remove('visible');
+                        setCurrentTab('music');
+                    } else if (event.data.type === 'restore') {
+                        setWindowedLayout(musicModal);
+                        bringToFront('musicModal');
+                        musicMiniPlayer.classList.remove('visible');
+                        setCurrentTab('music');
+                    } else if (event.data.type === 'close') {
+                        musicModal.style.display = 'none';
+                        musicBottomTab.classList.remove('active');
+                        musicMiniPlayer.classList.remove('visible');
+                        setFallbackCurrentTab();
+                    } else if (event.data.type === 'focus') {
+                        bringToFront('musicModal');
+                        setCurrentTab('music');
                     }
                     return;
                 }
@@ -964,6 +1072,42 @@
                 if (window.ArchivosApp?.openFloating) {
                     window.ArchivosApp.openFloating();
                 }
+            }
+
+            function openMusicWindow() {
+                const modal = document.getElementById('musicModal');
+                const musicBottomTab = document.getElementById('musicBottomTab');
+                const miniPlayer = document.getElementById('musicMiniPlayer');
+
+                setWindowedLayout(modal);
+                bringToFront('musicModal');
+                musicBottomTab.classList.add('active');
+                setCurrentTab('music');
+                miniPlayer.classList.remove('visible');
+
+                if (window.MusicApp?.openFloating) {
+                    window.MusicApp.openFloating();
+                }
+            }
+
+            function restoreMusicFromTaskbar() {
+                openMusicWindow();
+            }
+
+            function restoreMusicFromMini(event) {
+                if (event) event.stopPropagation();
+                openMusicWindow();
+            }
+
+            function closeMusicWindow() {
+                const modal = document.getElementById('musicModal');
+                const miniPlayer = document.getElementById('musicMiniPlayer');
+                const musicBottomTab = document.getElementById('musicBottomTab');
+
+                modal.style.display = 'none';
+                miniPlayer.classList.remove('visible');
+                musicBottomTab.classList.remove('active');
+                setFallbackCurrentTab();
             }
 
             initDashboardTheme();

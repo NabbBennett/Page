@@ -3,10 +3,14 @@
 use App\Models\SocialPost;
 use App\Models\SocialComment;
 use App\Models\SocialUser;
+use App\Models\MusicPlaylist;
+use App\Models\MusicTrack;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 Route::get('/', function () {
     return view('welcome');
@@ -98,6 +102,197 @@ Route::get('/archivos', function () {
         'userType' => session('user_type', 'guest'),
     ]);
 })->name('archivos');
+
+Route::get('/music/playlists', function () {
+    $playlists = MusicPlaylist::query()
+        ->with(['tracks' => function ($query) {
+            $query->orderBy('position')->orderBy('id');
+        }])
+        ->orderBy('name')
+        ->get();
+
+    return response()->json([
+        'playlists' => $playlists->map(function (MusicPlaylist $playlist) {
+            return [
+                'id' => $playlist->id,
+                'name' => $playlist->name,
+                'description' => $playlist->description,
+                'cover_url' => Str::startsWith((string) $playlist->cover_url, ['/storage/', 'storage/'])
+                    ? asset(ltrim((string) $playlist->cover_url, '/'))
+                    : $playlist->cover_url,
+                'tracks' => $playlist->tracks->map(function (MusicTrack $track) {
+                    return [
+                        'id' => $track->id,
+                        'title' => $track->title,
+                        'artist' => $track->artist,
+                        'album' => $track->album,
+                        'audio_url' => Str::startsWith((string) $track->audio_url, ['/storage/', 'storage/'])
+                            ? asset(ltrim((string) $track->audio_url, '/'))
+                            : $track->audio_url,
+                        'youtube_url' => $track->youtube_url,
+                        'youtube_video_id' => $track->youtube_video_id,
+                        'thumbnail_url' => Str::startsWith((string) $track->thumbnail_url, ['/storage/', 'storage/'])
+                            ? asset(ltrim((string) $track->thumbnail_url, '/'))
+                            : $track->thumbnail_url,
+                        'embed_url' => $track->embed_url,
+                        'duration_seconds' => $track->duration_seconds,
+                        'position' => $track->position,
+                    ];
+                })->values(),
+            ];
+        })->values(),
+    ]);
+});
+
+Route::post('/music/upload-cover', function (Request $request) {
+    if (session('user_type') !== 'admin') {
+        return response()->json(['message' => 'No autorizado'], 403);
+    }
+
+    $validated = $request->validate([
+        'cover' => ['required', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:5120'],
+    ]);
+
+    $path = $validated['cover']->store('music-covers', 'public');
+
+    return response()->json([
+        'message' => 'Portada subida correctamente.',
+        'cover_url' => asset('storage/'.$path),
+        'cover_path' => $path,
+    ], 201);
+});
+
+Route::post('/music/playlists', function (Request $request) {
+    if (session('user_type') !== 'admin') {
+        return response()->json(['message' => 'No autorizado'], 403);
+    }
+
+    $validated = $request->validate([
+        'name' => ['required', 'string', 'max:255'],
+        'description' => ['nullable', 'string', 'max:4000'],
+        'cover_url' => ['nullable', 'string', 'max:10000'],
+    ]);
+
+    $playlist = MusicPlaylist::query()->create([
+        'name' => trim($validated['name']),
+        'description' => trim((string) ($validated['description'] ?? '')) ?: null,
+        'cover_url' => trim((string) ($validated['cover_url'] ?? '')) ?: null,
+        'created_by_user_id' => session('user_id'),
+    ]);
+
+    return response()->json([
+        'message' => 'Playlist creada correctamente.',
+        'playlist' => [
+            'id' => $playlist->id,
+            'name' => $playlist->name,
+            'description' => $playlist->description,
+            'cover_url' => $playlist->cover_url,
+            'tracks' => [],
+        ],
+    ], 201);
+});
+
+Route::put('/music/playlists/{playlist}', function (Request $request, MusicPlaylist $playlist) {
+    if (session('user_type') !== 'admin') {
+        return response()->json(['message' => 'No autorizado'], 403);
+    }
+
+    $validated = $request->validate([
+        'name' => ['required', 'string', 'max:255'],
+        'description' => ['nullable', 'string', 'max:4000'],
+        'cover_url' => ['nullable', 'string', 'max:10000'],
+    ]);
+
+    $playlist->update([
+        'name' => trim($validated['name']),
+        'description' => trim((string) ($validated['description'] ?? '')) ?: null,
+        'cover_url' => trim((string) ($validated['cover_url'] ?? '')) ?: null,
+    ]);
+
+    return response()->json(['message' => 'Playlist actualizada correctamente.']);
+});
+
+Route::delete('/music/playlists/{playlist}', function (MusicPlaylist $playlist) {
+    if (session('user_type') !== 'admin') {
+        return response()->json(['message' => 'No autorizado'], 403);
+    }
+
+    $playlist->delete();
+
+    return response()->json(['message' => 'Playlist eliminada correctamente.']);
+});
+
+Route::post('/music/tracks', function (Request $request) {
+    if (session('user_type') !== 'admin') {
+        return response()->json(['message' => 'No autorizado'], 403);
+    }
+
+    $validated = $request->validate([
+        'music_playlist_id' => ['required', 'integer', 'exists:music_playlists,id'],
+        'title' => ['required', 'string', 'max:255'],
+        'artist' => ['required', 'string', 'max:255'],
+        'album' => ['required', 'string', 'max:255'],
+        'audio' => ['required', 'file', 'mimes:mp3', 'max:25600'],
+        'cover' => ['required', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:5120'],
+    ]);
+
+    $playlistId = (int) $validated['music_playlist_id'];
+    $lastPosition = (int) (MusicTrack::query()
+        ->where('music_playlist_id', $playlistId)
+        ->max('position') ?? 0);
+
+    $audioPath = $validated['audio']->store('music-tracks', 'public');
+    $coverPath = $validated['cover']->store('music-covers', 'public');
+
+    $track = MusicTrack::query()->create([
+        'music_playlist_id' => $playlistId,
+        'title' => trim((string) $validated['title']),
+        'artist' => trim((string) $validated['artist']),
+        'album' => trim((string) $validated['album']),
+        'audio_url' => asset('storage/'.$audioPath),
+        'youtube_url' => '',
+        'youtube_video_id' => '',
+        'thumbnail_url' => asset('storage/'.$coverPath),
+        'embed_url' => '',
+        'duration_seconds' => null,
+        'position' => $lastPosition + 1,
+    ]);
+
+    return response()->json([
+        'message' => 'Canción agregada correctamente.',
+        'track' => [
+            'id' => $track->id,
+            'music_playlist_id' => $track->music_playlist_id,
+            'title' => $track->title,
+            'artist' => $track->artist,
+            'album' => $track->album,
+            'audio_url' => $track->audio_url,
+            'youtube_url' => $track->youtube_url,
+            'youtube_video_id' => $track->youtube_video_id,
+            'thumbnail_url' => $track->thumbnail_url,
+            'embed_url' => $track->embed_url,
+            'duration_seconds' => $track->duration_seconds,
+            'position' => $track->position,
+        ],
+    ], 201);
+});
+
+Route::delete('/music/tracks/{track}', function (MusicTrack $track) {
+    if (session('user_type') !== 'admin') {
+        return response()->json(['message' => 'No autorizado'], 403);
+    }
+
+    foreach ([$track->audio_url, $track->thumbnail_url] as $url) {
+        $path = trim((string) parse_url((string) $url, PHP_URL_PATH), '/');
+        if (Str::startsWith($path, 'storage/')) {
+            Storage::disk('public')->delete(Str::after($path, 'storage/'));
+        }
+    }
+
+    $track->delete();
+
+    return response()->json(['message' => 'Canción eliminada correctamente.']);
+});
 
 Route::post('/social/posts', function (Request $request) {
     if (session('user_type') !== 'admin') {
