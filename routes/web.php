@@ -117,9 +117,23 @@ Route::get('/music/playlists', function () {
                 'id' => $playlist->id,
                 'name' => $playlist->name,
                 'description' => $playlist->description,
-                'cover_url' => Str::startsWith((string) $playlist->cover_url, ['/storage/', 'storage/'])
-                    ? asset(ltrim((string) $playlist->cover_url, '/'))
-                    : $playlist->cover_url,
+                'cover_url' => (function () use ($playlist) {
+                    $coverUrl = (string) $playlist->cover_url;
+
+                    if (Str::startsWith($coverUrl, ['/storage/', 'storage/'])) {
+                        return asset(ltrim($coverUrl, '/'));
+                    }
+
+                    if (Str::startsWith($coverUrl, ['storage\\app\\public\\', 'storage/app/public/'])) {
+                        $relativeFile = Str::after($coverUrl, Str::startsWith($coverUrl, 'storage\\app\\public\\')
+                            ? 'storage\\app\\public\\'
+                            : 'storage/app/public/');
+
+                        return asset('storage/'.str_replace('\\', '/', $relativeFile));
+                    }
+
+                    return $playlist->cover_url;
+                })(),
                 'tracks' => $playlist->tracks->map(function (MusicTrack $track) {
                     return [
                         'id' => $track->id,
@@ -154,11 +168,13 @@ Route::post('/music/upload-cover', function (Request $request) {
     ]);
 
     $path = $validated['cover']->store('music-covers', 'public');
+    $dbPath = 'storage\\app\\public\\'.str_replace('/', '\\', $path);
 
     return response()->json([
         'message' => 'Portada subida correctamente.',
-        'cover_url' => asset('storage/'.$path),
+        'cover_url' => $dbPath,
         'cover_path' => $path,
+        'cover_public_url' => asset('storage/'.$path),
     ], 201);
 });
 

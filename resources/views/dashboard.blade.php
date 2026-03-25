@@ -16,6 +16,8 @@
         <style>
             body {
                 font-family: 'Figtree', sans-serif;
+                height: 100dvh;
+                overflow: hidden;
             }
 
             @keyframes menuSlideUp {
@@ -107,6 +109,35 @@
                 border-color: rgba(181, 155, 121, 1);
                 background-color: rgba(181, 155, 121, 0.34);
                 box-shadow: inset 0 0 0 1px rgba(226, 216, 204, 0.18);
+            }
+
+            .mobile-start-apps {
+                display: none;
+                margin-top: 0.35rem;
+                border-top: 1px solid rgba(255, 255, 255, 0.12);
+                padding-top: 0.35rem;
+            }
+
+            .mobile-start-apps.active {
+                display: block;
+            }
+
+            .mobile-start-title {
+                font-size: 0.72rem;
+                letter-spacing: 0.04em;
+                text-transform: uppercase;
+                color: rgba(255, 255, 255, 0.72);
+                padding: 0.45rem 1rem 0.35rem;
+            }
+
+            .mobile-start-empty {
+                color: rgba(255, 255, 255, 0.65);
+                font-size: 0.86rem;
+                padding: 0.55rem 1rem 0.8rem;
+            }
+
+            .mobile-start-apps .menu-item {
+                width: 100%;
             }
 
             .taskbar-tab.social {
@@ -439,7 +470,7 @@
                 top: 0;
                 left: 0;
                 width: 100%;
-                height: calc(100vh - 72px);
+                height: calc(100dvh - 72px);
                 background: transparent;
                 z-index: 1000;
                 pointer-events: none;
@@ -479,9 +510,34 @@
                 flex-shrink: 0;
             }
 
+            @media (max-width: 768px) {
+                .taskbar-tab,
+                .taskbar-separator {
+                    display: none !important;
+                }
+
+                .bottom-bar {
+                    padding: 0.75rem 1rem;
+                }
+
+                .floating-app .text-editor-window,
+                .floating-app .app-window,
+                .floating-app .library-window,
+                .floating-app .files-window,
+                .floating-app .music-app-window {
+                    width: 100vw !important;
+                    max-width: 100vw !important;
+                    min-width: 0 !important;
+                    left: 0 !important;
+                    right: 0 !important;
+                    transform: none !important;
+                    border-radius: 0 !important;
+                }
+            }
+
         </style>
     </head>
-    <body class="dashboard-bg min-h-screen flex flex-col">
+    <body class="dashboard-bg h-screen flex flex-col">
         <!-- Chat Icon (Top Right) -->
         <div class="chat-icon">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -589,6 +645,7 @@
                     </svg>
                     <span>Cerrar Sesión</span>
                 </div>
+                <div id="mobileStartApps" class="mobile-start-apps"></div>
             </div>
 
             <div class="flex items-center gap-4">
@@ -790,7 +847,7 @@
                 modal.style.top = '0';
                 modal.style.left = '0';
                 modal.style.width = '100%';
-                modal.style.height = 'calc(100vh - 72px)';
+                modal.style.height = 'calc(100dvh - 72px)';
             }
 
             function setMaxLayout(modal) {
@@ -798,12 +855,66 @@
                 modal.style.top = '0';
                 modal.style.left = '0';
                 modal.style.width = '100%';
-                modal.style.height = 'calc(100vh - 72px)';
+                modal.style.height = 'calc(100dvh - 72px)';
+            }
+
+            function isPhoneViewport() {
+                return window.matchMedia('(max-width: 768px)').matches;
+            }
+
+            function renderMobileStartApps() {
+                const container = document.getElementById('mobileStartApps');
+                if (!container) return;
+
+                if (!isPhoneViewport()) {
+                    container.classList.remove('active');
+                    container.innerHTML = '';
+                    return;
+                }
+
+                const entries = [];
+
+                if (document.getElementById('editorBottomTab')?.classList.contains('active')) {
+                    entries.push({ icon: 'fa-file-alt', label: 'Editor de Texto', action: 'restoreEditorFromTaskbar()' });
+                }
+                if (document.getElementById('socialBottomTab')?.classList.contains('active')) {
+                    entries.push({ icon: 'fa-user-group', label: 'Red Social', action: 'restoreSocialFromTaskbar()' });
+                }
+                if (document.getElementById('libraryBottomTab')?.classList.contains('active')) {
+                    entries.push({ icon: 'fa-book', label: 'Biblioteca', action: 'restoreLibraryFromTaskbar()' });
+                }
+                if (document.getElementById('filesBottomTab')?.classList.contains('active')) {
+                    entries.push({ icon: 'fa-folder', label: 'Archivos', action: 'restoreFilesFromTaskbar()' });
+                }
+                if (document.getElementById('musicBottomTab')?.classList.contains('active')) {
+                    entries.push({ icon: 'fa-music', label: 'Música', action: 'restoreMusicFromTaskbar()' });
+                }
+
+                if (entries.length === 0) {
+                    container.innerHTML = `
+                        <div class="mobile-start-title">Aplicaciones abiertas</div>
+                        <div class="mobile-start-empty">No hay ventanas minimizadas.</div>
+                    `;
+                    container.classList.add('active');
+                    return;
+                }
+
+                container.innerHTML = `
+                    <div class="mobile-start-title">Aplicaciones abiertas</div>
+                    ${entries.map((entry) => `
+                        <button class="menu-item" onclick="${entry.action}; toggleMenu();">
+                            <i class="fas ${entry.icon}"></i>
+                            <span>${entry.label}</span>
+                        </button>
+                    `).join('')}
+                `;
+                container.classList.add('active');
             }
 
             function toggleMenu() {
                 const menu = document.getElementById('menuPopup');
                 menu.classList.toggle('active');
+                renderMobileStartApps();
                 
                 // Cerrar menu al hacer click fuera
                 document.addEventListener('click', function(event) {
@@ -1112,6 +1223,7 @@
 
             initDashboardTheme();
             setupFloatingWindowFocus();
+            renderMobileStartApps();
 
             function logout() {
                 // Transición de pantalla negra
@@ -1151,6 +1263,8 @@
                     menu.classList.remove('active');
                 }
             });
+
+            window.addEventListener('resize', renderMobileStartApps);
         </script>
     </body>
 </html>

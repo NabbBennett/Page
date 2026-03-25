@@ -223,6 +223,7 @@
         grid-template-columns: 92px 1fr;
     }
 
+    #musicModal .music-app-window.sidebar-collapsed .sidebar-logo,
     #musicModal .music-app-window.sidebar-collapsed .sidebar-brand,
     #musicModal .music-app-window.sidebar-collapsed .sidebar-nav-btn span,
     #musicModal .music-app-window.sidebar-collapsed .sidebar-section-title,
@@ -865,7 +866,7 @@
             <div class="sidebar-head">
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-music sidebar-logo"></i>
-                    <div class="sidebar-brand">Soundwave</div>
+                    <div class="sidebar-brand">Cabraffy</div>
                 </div>
                 <button id="musicSidebarToggleBtn" class="sidebar-toggle-btn" type="button" onclick="toggleMusicSidebar()" title="Contraer barra lateral">
                     <i class="fa-solid fa-angles-left"></i>
