@@ -662,6 +662,10 @@
 		filesDataCache = data;
 	}
 
+	function filesIsAdmin() {
+		return FILES_USER_ROLE === 'admin';
+	}
+
 	function escapeFilesHtml(text) {
 		return (text || '')
 			.replaceAll('&', '&amp;')
@@ -688,8 +692,8 @@
 					<input class="search-input" placeholder="Buscar carpetas y archivos..." value="${escapeFilesHtml(currentSearch)}" oninput="setFilesSearch(this.value)" />
 				</div>
 				<button class="icon-btn" type="button" onclick="refreshFilesView()"><i class="fa-solid fa-rotate-right"></i></button>
-				<button class="ghost-btn" type="button" onclick="openCreateFolderModal()"><i class="fa-solid fa-folder-plus"></i> Nueva carpeta</button>
-				<button class="primary-btn" type="button" onclick="openUploadImageModal()"><i class="fa-solid fa-plus"></i> Subir Imagen</button>
+				${filesIsAdmin() ? '<button class="ghost-btn" type="button" onclick="openCreateFolderModal()"><i class="fa-solid fa-folder-plus"></i> Nueva carpeta</button>' : ''}
+				${filesIsAdmin() ? '<button class="primary-btn" type="button" onclick="openUploadImageModal()"><i class="fa-solid fa-plus"></i> Subir Imagen</button>' : ''}
 			</div>
 			<div class="toolbar-title">Mis Carpetas</div>
 			<div class="folders-grid">
@@ -733,8 +737,8 @@
 		document.getElementById('filesBody').innerHTML = `
 			<div class="top-bar" style="grid-template-columns: 1fr auto auto;">
 				<button class="ghost-btn" type="button" onclick="renderFolderGrid()"><i class="fa-solid fa-arrow-left"></i> Volver a Carpetas</button>
-				<button class="ghost-btn" type="button" onclick="openEditFolderModal('${folder.id}')"><i class="fa-solid fa-pen-to-square"></i> Editar carpeta</button>
-				<button class="primary-btn" type="button" onclick="openUploadImageModal('${folder.id}')"><i class="fa-solid fa-plus"></i> Subir Imagen</button>
+				${filesIsAdmin() ? `<button class="ghost-btn" type="button" onclick="openEditFolderModal('${folder.id}')"><i class="fa-solid fa-pen-to-square"></i> Editar carpeta</button>` : ''}
+				${filesIsAdmin() ? `<button class="primary-btn" type="button" onclick="openUploadImageModal('${folder.id}')"><i class="fa-solid fa-plus"></i> Subir Imagen</button>` : ''}
 			</div>
 			<div class="toolbar-title" style="margin-top:10px;">${escapeFilesHtml(folder.name)}</div>
 			<div class="folder-files-list">
@@ -756,6 +760,7 @@
 	}
 
 	function openEditFolderModal(folderId) {
+		if (!filesIsAdmin()) return;
 		const data = getFilesData();
 		const folder = data.folders.find(item => item.id === folderId);
 		if (!folder) return;
@@ -788,6 +793,7 @@
 	}
 
 	async function saveEditFolderName() {
+		if (!filesIsAdmin()) return;
 		if (!editingFolderId) return;
 		const input = document.getElementById('editFolderNameInput');
 		if (!input) return;
@@ -819,6 +825,7 @@
 	}
 
 	async function removeFileFromEditModal(fileId) {
+		if (!filesIsAdmin()) return;
 		if (!editingFolderId) return;
 		const data = getFilesData();
 		const file = data.files.find(item => item.id === fileId && item.folderId === editingFolderId);
@@ -842,6 +849,7 @@
 	}
 
 	async function deleteFolderFromEditModal() {
+		if (!filesIsAdmin()) return;
 		if (!editingFolderId) return;
 		const data = getFilesData();
 		const folder = data.folders.find(item => item.id === editingFolderId);
@@ -924,6 +932,7 @@
 	}
 
 	function openCreateFolderModal() {
+		if (!filesIsAdmin()) return;
 		document.getElementById('folderNameInput').value = '';
 		document.getElementById('createFolderModal').classList.add('active');
 	}
@@ -933,6 +942,7 @@
 	}
 
 	async function saveFolder() {
+		if (!filesIsAdmin()) return;
 		const name = document.getElementById('folderNameInput').value.trim();
 		if (!name) {
 			alert('Ingresa un nombre para la carpeta.');
@@ -984,6 +994,7 @@
 	}
 
 	async function openUploadImageModal(preselectedFolderId = null) {
+		if (!filesIsAdmin()) return;
 		await loadFilesDataFromApi();
 		const data = getFilesData();
 		const select = document.getElementById('uploadFolderSelect');
@@ -1018,6 +1029,7 @@
 	}
 
 	async function saveUploadedImage() {
+		if (!filesIsAdmin()) return;
 		const imageFile = document.getElementById('uploadImageInput').files[0];
 		const name = document.getElementById('uploadNameInput').value.trim();
 		const folderId = document.getElementById('uploadFolderSelect').value;

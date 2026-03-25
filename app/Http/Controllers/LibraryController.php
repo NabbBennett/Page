@@ -17,18 +17,9 @@ class LibraryController extends Controller
 
     public function books()
     {
-        $userType = (string) session('user_type', 'guest');
-        $userId = session('user_id');
-
         $query = LibraryBook::query()
-            ->where('user_type', $userType)
+            ->where('user_type', 'admin')
             ->orderByDesc('id');
-
-        if ($userId) {
-            $query->where('user_id', $userId);
-        } else {
-            $query->whereNull('user_id');
-        }
 
         $books = $query->get()->map(function (LibraryBook $book) {
             $chapters = LibraryBookAssignment::query()
@@ -62,6 +53,10 @@ class LibraryController extends Controller
 
     public function storeBook(Request $request)
     {
+        if ($unauthorized = $this->ensureAdmin()) {
+            return $unauthorized;
+        }
+
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'author' => ['required', 'string', 'max:255'],
@@ -95,8 +90,8 @@ class LibraryController extends Controller
 
     public function updateBook(Request $request, LibraryBook $book)
     {
-        if (!$this->canAccessOwnedBook($book)) {
-            return response()->json(['message' => 'No autorizado'], 403);
+        if ($unauthorized = $this->ensureAdmin()) {
+            return $unauthorized;
         }
 
         $validated = $request->validate([
@@ -130,8 +125,8 @@ class LibraryController extends Controller
 
     public function deleteBook(LibraryBook $book)
     {
-        if (!$this->canAccessOwnedBook($book)) {
-            return response()->json(['message' => 'No autorizado'], 403);
+        if ($unauthorized = $this->ensureAdmin()) {
+            return $unauthorized;
         }
 
         $book->delete();
@@ -141,8 +136,8 @@ class LibraryController extends Controller
 
     public function storeAssignment(Request $request, LibraryBook $book)
     {
-        if (!$this->canAccessOwnedBook($book)) {
-            return response()->json(['message' => 'No autorizado'], 403);
+        if ($unauthorized = $this->ensureAdmin()) {
+            return $unauthorized;
         }
 
         $validated = $request->validate([
@@ -180,8 +175,8 @@ class LibraryController extends Controller
             return response()->json(['message' => 'Asignación inválida para este libro.'], 422);
         }
 
-        if (!$this->canAccessOwnedBook($book)) {
-            return response()->json(['message' => 'No autorizado'], 403);
+        if ($unauthorized = $this->ensureAdmin()) {
+            return $unauthorized;
         }
 
         $chapter->delete();
@@ -189,23 +184,12 @@ class LibraryController extends Controller
         return response()->json(['message' => 'Capítulo eliminado correctamente.']);
     }
 
-    private function canAccessOwnedBook(LibraryBook $book): bool
+    private function ensureAdmin()
     {
-        $sessionUserType = (string) session('user_type', 'guest');
-        $sessionUserId = session('user_id');
-
-        if ($book->user_type !== $sessionUserType) {
-            return false;
+        if ((string) session('user_type', 'guest') !== 'admin') {
+            return response()->json(['message' => 'No autorizado'], 403);
         }
 
-        if ($sessionUserId && (int) $book->user_id !== (int) $sessionUserId) {
-            return false;
-        }
-
-        if (!$sessionUserId && !is_null($book->user_id)) {
-            return false;
-        }
-
-        return true;
+        return null;
     }
 }

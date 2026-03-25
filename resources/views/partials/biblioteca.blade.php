@@ -1085,7 +1085,7 @@
 					<h2><i class="fa-solid fa-book"></i> Mi Biblioteca</h2>
 					<div class="muted">${books.length} libro${books.length === 1 ? '' : 's'} en la colección</div>
 				</div>
-				<button type="button" class="primary-btn" onclick="openLibraryCreateModal()"><i class="fa-solid fa-plus"></i> Crear libro</button>
+				${libraryIsAdmin() ? '<button type="button" class="primary-btn" onclick="openLibraryCreateModal()"><i class="fa-solid fa-plus"></i> Crear libro</button>' : ''}
 			</div>
 			<div class="library-grid">
 				${books.map(book => `
@@ -1114,10 +1114,12 @@
 		body.innerHTML = `
 			<div class="library-toolbar" style="padding:14px 20px;">
 				<button type="button" class="ghost-btn" onclick="renderLibraryHome()"><i class="fa-solid fa-arrow-left"></i> Biblioteca</button>
-				<div style="display:flex; gap:10px;">
-					<button type="button" class="primary-btn" style="background:#e67e00;" onclick="openLibraryEditModal('${book.id}')"><i class="fa-solid fa-pen"></i> Editar libro</button>
-					<button type="button" class="danger-btn" onclick="confirmDeleteLibraryBook('${book.id}')"><i class="fa-solid fa-trash"></i> Eliminar</button>
-				</div>
+				${libraryIsAdmin() ? `
+					<div style="display:flex; gap:10px;">
+						<button type="button" class="primary-btn" style="background:#e67e00;" onclick="openLibraryEditModal('${book.id}')"><i class="fa-solid fa-pen"></i> Editar libro</button>
+						<button type="button" class="danger-btn" onclick="confirmDeleteLibraryBook('${book.id}')"><i class="fa-solid fa-trash"></i> Eliminar</button>
+					</div>
+				` : ''}
 			</div>
 
 			<div class="detail-wrap">
@@ -1168,6 +1170,7 @@
 	}
 
 	function openChapterInEditor(bookId, chapterId) {
+		if (!libraryIsAdmin()) return;
 		const books = getLibraryBooks();
 		const book = books.find(item => item.id === bookId);
 		if (!book) return;
@@ -1356,6 +1359,7 @@
 	}
 
 	function openLibraryCreateModal() {
+		if (!libraryIsAdmin()) return;
 		resetLibraryForm();
 		document.getElementById('libraryFormTitle').textContent = 'Crear nuevo libro';
 		document.getElementById('libraryCreateActions').style.display = 'grid';
@@ -1364,6 +1368,7 @@
 	}
 
 	function openLibraryEditModal(bookId) {
+		if (!libraryIsAdmin()) return;
 		const books = getLibraryBooks();
 		const book = books.find(item => item.id === bookId);
 		if (!book) return;
@@ -1396,6 +1401,7 @@
 	}
 
 	async function saveLibraryBook() {
+		if (!libraryIsAdmin()) return;
 		const title = document.getElementById('libraryTitleInput').value.trim();
 		const author = document.getElementById('libraryAuthorInput').value.trim();
 		const synopsis = document.getElementById('librarySynopsisInput').value.trim();
@@ -1449,6 +1455,7 @@
 	}
 
 	async function confirmDeleteLibraryBook(bookId) {
+		if (!libraryIsAdmin()) return;
 		if (!confirm('¿Eliminar este libro?')) return;
 
 		try {
@@ -1463,6 +1470,7 @@
 	}
 
 	async function deleteLibraryBook() {
+		if (!libraryIsAdmin()) return;
 		if (!editingLibraryBookId) return;
 		if (!confirm('¿Eliminar este libro?')) return;
 

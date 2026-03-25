@@ -18,18 +18,9 @@ class FileController extends Controller
 
     public function writings()
     {
-        $userType = (string) session('user_type', 'guest');
-        $userId = session('user_id');
-
         $query = FileWriting::query()
-            ->where('user_type', $userType)
+            ->where('user_type', 'admin')
             ->orderByDesc('id');
-
-        if ($userId) {
-            $query->where('user_id', $userId);
-        } else {
-            $query->whereNull('user_id');
-        }
 
         $writings = $query->get()->map(function (FileWriting $writing) {
             $assignment = FileWritingAssignment::query()
@@ -56,6 +47,10 @@ class FileController extends Controller
 
     public function storeWriting(Request $request)
     {
+        if ($unauthorized = $this->ensureAdmin()) {
+            return $unauthorized;
+        }
+
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'folder_id' => ['nullable', 'integer', 'exists:file_folders,id'],
@@ -114,8 +109,8 @@ class FileController extends Controller
 
     public function deleteWriting(FileWriting $writing)
     {
-        if (!$this->canAccessOwnedRecord($writing->user_type, $writing->user_id)) {
-            return response()->json(['message' => 'No autorizado'], 403);
+        if ($unauthorized = $this->ensureAdmin()) {
+            return $unauthorized;
         }
 
         $writing->delete();
@@ -125,18 +120,9 @@ class FileController extends Controller
 
     public function folders()
     {
-        $userType = (string) session('user_type', 'guest');
-        $userId = session('user_id');
-
         $query = FileFolder::query()
-            ->where('user_type', $userType)
+            ->where('user_type', 'admin')
             ->orderBy('name');
-
-        if ($userId) {
-            $query->where('user_id', $userId);
-        } else {
-            $query->whereNull('user_id');
-        }
 
         return response()->json([
             'folders' => $query->get()->map(fn (FileFolder $folder) => [
@@ -148,6 +134,10 @@ class FileController extends Controller
 
     public function storeFolder(Request $request)
     {
+        if ($unauthorized = $this->ensureAdmin()) {
+            return $unauthorized;
+        }
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
         ]);
@@ -169,8 +159,8 @@ class FileController extends Controller
 
     public function updateFolder(Request $request, FileFolder $folder)
     {
-        if (!$this->canAccessOwnedRecord($folder->user_type, $folder->user_id)) {
-            return response()->json(['message' => 'No autorizado'], 403);
+        if ($unauthorized = $this->ensureAdmin()) {
+            return $unauthorized;
         }
 
         $validated = $request->validate([
@@ -192,8 +182,8 @@ class FileController extends Controller
 
     public function deleteFolder(FileFolder $folder)
     {
-        if (!$this->canAccessOwnedRecord($folder->user_type, $folder->user_id)) {
-            return response()->json(['message' => 'No autorizado'], 403);
+        if ($unauthorized = $this->ensureAdmin()) {
+            return $unauthorized;
         }
 
         $writingIds = FileWritingAssignment::query()
@@ -211,23 +201,12 @@ class FileController extends Controller
         return response()->json(['message' => 'Carpeta eliminada correctamente.']);
     }
 
-    private function canAccessOwnedRecord(string $recordUserType, ?int $recordUserId): bool
+    private function ensureAdmin()
     {
-        $sessionUserType = (string) session('user_type', 'guest');
-        $sessionUserId = session('user_id');
-
-        if ($recordUserType !== $sessionUserType) {
-            return false;
+        if ((string) session('user_type', 'guest') !== 'admin') {
+            return response()->json(['message' => 'No autorizado'], 403);
         }
 
-        if ($sessionUserId && (int) $recordUserId !== (int) $sessionUserId) {
-            return false;
-        }
-
-        if (!$sessionUserId && !is_null($recordUserId)) {
-            return false;
-        }
-
-        return true;
+        return null;
     }
 }
