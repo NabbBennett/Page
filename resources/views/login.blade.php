@@ -8,14 +8,34 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
 
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Concert+One&display=swap" rel="stylesheet">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
         <script src="https://cdn.tailwindcss.com"></script>
         
         <!-- Font Awesome -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
         <style>
+            .concert-one-regular {
+                font-family: "Concert One", sans-serif;
+                font-weight: 400;
+                font-style: normal;
+            }
+            
+            .roboto-condensed{
+                font-family: "Roboto Condensed", sans-serif;
+                font-optical-sizing: auto;
+                font-weight: <weight>;
+                font-style: normal;
+            }
+
             body {
-                font-family: 'Figtree', sans-serif;
+                font-family: 'Roboto Condensed', sans-serif;
                 background-color: #443C3D;
             }
             
@@ -23,17 +43,17 @@
                 background-color: #E2D8CC;
             }
 
-            .icon-circle {
-                background-color: #C4B8A8;
-                border: 4px solid #443C3D;
-            }
-
-            .icon-circle svg {
-                color: #443C3D;
+            .logo-icon{
+                width: 150px;
+                height: 150px;
+                background-color: #443C3D;
+                -webkit-mask: url('/storage/photo/NABBLOGO_BLANCO.png') center / contain no-repeat;
+                mask: url('/storage/photo/NABBLOGO_BLANCO.png') center / contain no-repeat;
             }
 
             .title-text {
                 color: #443C3D;
+                font-family: 'Concert One', sans-serif;
             }
 
             .subtitle-text {
@@ -86,19 +106,15 @@
     <body class="min-h-screen flex items-center justify-center p-4">
         <div class="card-container rounded-3xl shadow-2xl p-8 max-w-md w-full">
             <!-- Icon Circle -->
-            <div class="flex justify-center mb-8">
-                <div class="icon-circle w-24 h-24 rounded-full flex items-center justify-center">
-                    <svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 1C6.48 1 2 5.48 2 11v8c0 5.52 4.48 10 10 10h8c5.52 0 10-4.48 10-10v-8c0-5.52-4.48-10-10-10zm-2 15h-2v2h2v-2zm0-4h-2v2h2v-2zm0-4h-2v2h2v-2zm6 8h-2v2h2v-2zm0-4h-2v2h2v-2zm0-4h-2v2h2v-2zm6 8h-2v2h2v-2zm0-4h-2v2h2v-2zm0-4h-2v2h2v-2z"/>
-                    </svg>
-                </div>
+            <div class="flex justify-center">
+                <div class="logo-icon"></div>
             </div>
 
             <!-- Title -->
-            <h1 class="title-text text-3xl font-bold text-center mb-2">Acceso Administrador</h1>
+            <h1 class="title-text text-4xl font-bold text-center mb-2">ACCESO</h1>
             
             <!-- Subtitle -->
-            <p class="subtitle-text text-sm text-center mb-8">Ingresa tus credenciales</p>
+            <p class="subtitle-text text-sm text-center mb-6">Ingresa tus credenciales</p>
 
             <!-- Login Form -->
             <form action="{{ route('admin.login') }}" method="POST" class="space-y-6">
@@ -117,7 +133,7 @@
                         type="text" 
                         id="username" 
                         name="username" 
-                        placeholder="Nabb" 
+                        placeholder="Who are you?" 
                         value="{{ old('username') }}"
                         class="form-input w-full py-3 px-4 rounded-xl transition duration-200"
                         required

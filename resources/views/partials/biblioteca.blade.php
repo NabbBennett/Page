@@ -244,6 +244,7 @@
 		border-radius: 16px;
 		padding: 18px;
 		margin-top: 14px;
+		overflow-wrap: anywhere;
 	}
 
 	#libraryModal .chapter-item {
@@ -305,6 +306,16 @@
 	#libraryModal .reader-title {
 		text-align: center;
 		font-weight: 800;
+	}
+
+	#libraryModal .reader-top-actions {
+		display: flex;
+		gap: 8px;
+		justify-content: flex-end;
+	}
+
+	#libraryModal .reader-btn-label {
+		display: inline;
 	}
 
 	#libraryModal .reader-body {
@@ -504,6 +515,350 @@
 
 	#libraryModal .upload-zone.has-preview .upload-preview { display: block; }
 	#libraryModal .upload-zone.has-preview .upload-zone-content { display: none; }
+
+	@media (max-width: 900px) {
+		#libraryModal .library-toolbar {
+			padding: 14px 16px;
+			gap: 10px;
+		}
+
+		#libraryModal .library-title-wrap h2 {
+			font-size: 1.6rem;
+		}
+
+		#libraryModal .library-grid {
+			padding: 14px;
+			grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+			gap: 14px;
+		}
+
+		#libraryModal .book-cover {
+			width: 112px;
+			height: 166px;
+		}
+
+		#libraryModal .detail-wrap {
+			padding: 14px;
+		}
+
+		#libraryModal .detail-main {
+			grid-template-columns: 1fr;
+			gap: 12px;
+		}
+
+		#libraryModal .detail-cover {
+			width: 150px;
+			height: 210px;
+			display: block;
+			margin: 0 auto;
+		}
+
+		#libraryModal .reader-body {
+			padding: 14px;
+		}
+
+		#libraryModal .reader-layout {
+			grid-template-columns: 1fr;
+			position: relative;
+		}
+	}
+
+	@media (max-width: 768px) {
+		#libraryModal .library-window {
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: calc(100vh - 72px);
+			transform: none;
+			border-radius: 0;
+			resize: none;
+		}
+
+		#libraryModal .resize-handle {
+			display: none;
+		}
+
+		#libraryModal .library-toolbar {
+			flex-direction: column;
+			align-items: stretch;
+			padding: 12px;
+		}
+
+		#libraryModal .library-toolbar .primary-btn,
+		#libraryModal .library-toolbar .ghost-btn,
+		#libraryModal .library-toolbar .danger-btn {
+			width: 100%;
+		}
+
+		#libraryModal .detail-top-actions {
+			flex-direction: column;
+			align-items: stretch;
+			gap: 8px;
+		}
+
+		#libraryModal .detail-top-actions .primary-btn,
+		#libraryModal .detail-top-actions .ghost-btn,
+		#libraryModal .detail-top-actions .danger-btn {
+			width: 100%;
+		}
+
+		#libraryModal .chapter-item {
+			grid-template-columns: 1fr;
+			padding: 12px;
+		}
+
+		#libraryModal .card-block {
+			padding: 12px;
+			margin-top: 10px;
+			border-radius: 12px;
+		}
+
+		#libraryModal .card-block h3 {
+			font-size: 1.45rem !important;
+			line-height: 1.2;
+		}
+
+		#libraryModal .chapter-actions {
+			width: 100%;
+			justify-content: flex-end;
+			flex-wrap: wrap;
+		}
+
+		#libraryModal .reader-top {
+			grid-template-columns: auto 1fr auto;
+			gap: 8px;
+			padding: 10px 12px;
+		}
+
+		#libraryModal .reader-title {
+			text-align: center;
+		}
+
+		#libraryModal .reader-top-actions {
+			display: flex !important;
+			align-items: center;
+			justify-content: flex-end;
+		}
+
+		#libraryModal .reader-edit-btn,
+		#libraryModal .reader-back-btn,
+		#libraryModal .reader-caps-btn {
+			width: 40px;
+			height: 40px;
+			padding: 0;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			border-radius: 10px;
+		}
+
+		#libraryModal .reader-edit-btn {
+			padding: 0;
+			font-size: 0.95rem;
+		}
+
+		#libraryModal .reader-edit-btn .reader-btn-label,
+		#libraryModal .reader-back-btn .reader-btn-label,
+		#libraryModal .reader-caps-btn .reader-btn-label {
+			display: none;
+		}
+
+		#libraryModal .reader-edit-btn i,
+		#libraryModal .reader-back-btn i,
+		#libraryModal .reader-caps-btn i {
+			margin: 0;
+		}
+
+		#libraryModal .reader-caps {
+			position: absolute;
+			top: 0;
+			right: 0;
+			height: 100%;
+			z-index: 5;
+			background: #443C3D;
+			box-shadow: -10px 0 24px rgba(0, 0, 0, 0.35);
+		}
+
+		#libraryModal .reader-caps.active {
+			width: min(84vw, 300px);
+			border-left-width: 2px;
+			border-top: 0;
+			padding: 12px;
+		}
+
+		#libraryModal .reader-bottom {
+			padding: 12px;
+			gap: 8px;
+			grid-template-columns: auto 1fr auto;
+		}
+
+		#libraryModal .reader-bottom > div {
+			text-align: center;
+		}
+
+		#libraryModal .reader-bottom > div:first-child {
+			text-align: left;
+		}
+
+		#libraryModal .reader-bottom > div:last-child {
+			text-align: right;
+		}
+
+		#libraryModal .reader-nav-btn {
+			width: 42px;
+			height: 42px;
+			padding: 0;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		#libraryModal .reader-nav-btn .reader-btn-label {
+			display: none;
+		}
+
+		#libraryModal .reader-nav-btn i {
+			margin: 0;
+		}
+
+		#libraryModal .row-2,
+		#libraryModal .modal-actions,
+		#libraryModal .modal-actions-3 {
+			grid-template-columns: 1fr;
+		}
+
+		#libraryModal .modal-box {
+			width: calc(100% - 12px);
+			max-height: calc(100% - 12px);
+			padding: 12px;
+		}
+
+		#libraryModal #libraryFormModal {
+			align-items: flex-start;
+			padding: 8px 6px;
+		}
+
+		#libraryModal #libraryFormModal .modal-box {
+			width: 100%;
+			max-height: calc(100dvh - 88px);
+			padding: 10px;
+		}
+
+		#libraryModal #libraryCoverZone {
+			min-height: 200px;
+		}
+
+		#libraryModal #libraryCoverZone .upload-preview {
+			width: 140px;
+			height: 190px;
+		}
+	}
+
+	@media (max-width: 560px) {
+		#libraryModal .library-grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 10px;
+		}
+
+		#libraryModal .book-cover {
+			width: 96px;
+			height: 142px;
+		}
+
+		#libraryModal .book-title {
+			font-size: 1rem;
+		}
+
+		#libraryModal .detail-main h2,
+		#libraryModal .reader-body h2 {
+			font-size: 1.4rem !important;
+		}
+
+		#libraryModal .card-block {
+			padding: 10px;
+		}
+
+		#libraryModal .card-block h3 {
+			font-size: 1.22rem !important;
+			margin-bottom: 6px !important;
+		}
+
+		#libraryModal .reader-bottom {
+			grid-template-columns: auto 1fr auto;
+		}
+	}
+
+	@media (max-width: 420px) {
+		#libraryModal #libraryFormModal .modal-head h3 {
+			font-size: 1.15rem !important;
+		}
+
+		#libraryModal #libraryFormModal .modal-box {
+			max-height: calc(100dvh - 82px);
+			padding: 8px;
+		}
+
+		#libraryModal #libraryFormModal .input,
+		#libraryModal #libraryFormModal .textarea,
+		#libraryModal #libraryFormModal .select {
+			font-size: 0.92rem;
+			padding: 9px 10px;
+		}
+
+		#libraryModal #libraryCoverZone {
+			min-height: 156px;
+		}
+
+		#libraryModal #libraryCoverZone .upload-preview {
+			width: 104px;
+			height: 145px;
+		}
+
+		#libraryModal #libraryFormModal .modal-actions,
+		#libraryModal #libraryFormModal .modal-actions-3 {
+			gap: 8px;
+		}
+
+		#libraryModal #libraryFormModal .modal-actions .primary-btn,
+		#libraryModal #libraryFormModal .modal-actions .ghost-btn,
+		#libraryModal #libraryFormModal .modal-actions-3 .primary-btn,
+		#libraryModal #libraryFormModal .modal-actions-3 .ghost-btn,
+		#libraryModal #libraryFormModal .modal-actions-3 .danger-btn {
+			width: 100%;
+			padding: 9px 12px;
+			font-size: 0.92rem;
+		}
+
+		#libraryModal .library-grid {
+			grid-template-columns: 1fr;
+		}
+
+		#libraryModal .book-cover {
+			width: 110px;
+			height: 160px;
+		}
+
+		#libraryModal .library-title-wrap h2 {
+			font-size: 1.3rem;
+		}
+
+		#libraryModal .muted {
+			font-size: 0.85rem;
+		}
+
+		#libraryModal .chapter-item > div[style*='font-size:1.5rem'] {
+			font-size: 1.05rem !important;
+		}
+
+		#libraryModal .card-block {
+			padding: 8px;
+			margin-top: 8px;
+		}
+
+		#libraryModal .card-block h3 {
+			font-size: 1.08rem !important;
+		}
+	}
 </style>
 
 <div class="library-window" id="libraryWindow">
@@ -580,7 +935,7 @@
 	const LIBRARY_MIN_WIDTH = 320;
 	const LIBRARY_MIN_HEIGHT = 240;
 	const LIBRARY_USER_ROLE = @json($userType ?? 'guest');
-	const LIBRARY_STORAGE_KEY = `library_books_v1_${LIBRARY_USER_ROLE}`;
+	const LIBRARY_CSRF = @json(csrf_token());
 
 	let isLibraryMaximized = false;
 	let isLibraryDragging = false;
@@ -593,23 +948,11 @@
 	let libraryStartH = 0;
 	let editingLibraryBookId = null;
 	let libraryCurrentBookId = null;
+	let libraryBooksCache = [];
 
 	const libraryWindow = document.getElementById('libraryWindow');
 	const libraryResizeHandle = document.getElementById('libraryResizeHandle');
 	const libraryHeader = libraryWindow.querySelector('.window-header');
-
-	const defaultLibraryBooks = [
-		{
-			id: 'book-1',
-			title: 'Tun',
-			author: 'Sebastian',
-			synopsis: 'Primer libro en la colección.',
-			status: 'En emisión',
-			totalChapters: 1,
-			currentChapter: 0,
-			cover: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=600&q=80'
-		}
-	];
 
 	function sendLibraryMessage(type, extra = {}) {
 		const payload = { app: 'library', type, ...extra };
@@ -620,21 +963,65 @@
 		}
 	}
 
-	function getLibraryBooks() {
-		const raw = localStorage.getItem(LIBRARY_STORAGE_KEY);
-		if (!raw) {
-			const normalizedDefaults = normalizeLibraryBooks(defaultLibraryBooks);
-			localStorage.setItem(LIBRARY_STORAGE_KEY, JSON.stringify(normalizedDefaults));
-			return normalizedDefaults;
+	async function libraryApi(url, options = {}) {
+		const headers = {
+			'Accept': 'application/json',
+			'X-Requested-With': 'XMLHttpRequest',
+			...options.headers,
+		};
+
+		if (options.body && !(options.body instanceof FormData)) {
+			headers['Content-Type'] = 'application/json';
+			headers['X-CSRF-TOKEN'] = LIBRARY_CSRF;
 		}
 
-		const parsed = normalizeLibraryBooks(JSON.parse(raw));
-		localStorage.setItem(LIBRARY_STORAGE_KEY, JSON.stringify(parsed));
-		return parsed;
+		if ((options.method || 'GET').toUpperCase() !== 'GET' && !headers['X-CSRF-TOKEN']) {
+			headers['X-CSRF-TOKEN'] = LIBRARY_CSRF;
+		}
+
+		const response = await fetch(url, {
+			credentials: 'same-origin',
+			...options,
+			headers,
+		});
+
+		const data = await response.json().catch(() => ({}));
+		if (!response.ok) {
+			throw new Error(data?.message || 'No se pudo completar la operación.');
+		}
+
+		return data;
+	}
+
+	async function loadLibraryBooksFromApi() {
+		const response = await libraryApi('/biblioteca/libros');
+		const books = Array.isArray(response?.books) ? response.books : [];
+
+		libraryBooksCache = normalizeLibraryBooks(books.map(book => ({
+			id: String(book.id),
+			title: book.title || '',
+			author: book.author || '',
+			synopsis: book.description || '',
+			status: book.status || 'En emisión',
+			cover: book.cover_path || '',
+			chapters: Array.isArray(book.chapters)
+				? book.chapters
+					.sort((a, b) => Number(a.chapter_number || 0) - Number(b.chapter_number || 0))
+					.map((chapter, index) => ({
+						id: String(chapter.id),
+						title: chapter.chapter_title || `Capítulo ${index + 1}`,
+						content: chapter.html_content || chapter.text_content || '',
+					}))
+				: [],
+		}))); 
+	}
+
+	function getLibraryBooks() {
+		return libraryBooksCache;
 	}
 
 	function setLibraryBooks(items) {
-		localStorage.setItem(LIBRARY_STORAGE_KEY, JSON.stringify(items));
+		libraryBooksCache = normalizeLibraryBooks(items);
 	}
 
 	function escapeLibraryHtml(text) {
@@ -650,15 +1037,26 @@
 		return Array.isArray(book?.chapters) ? book.chapters : [];
 	}
 
+	function getBookTotalChapters(book) {
+		const chapters = getBookChapters(book);
+		if (chapters.length > 0) return chapters.length;
+		return Math.max(0, Number(book?.totalChapters ?? 0));
+	}
+
 	function normalizeLibraryBooks(items) {
 		if (!Array.isArray(items)) return [];
 		return items.map(item => {
-			const chapters = Array.isArray(item?.chapters) ? item.chapters : [];
-			const safeTotal = Math.max(1, Number(item?.totalChapters || chapters.length || 1));
-			const safeCurrent = Math.max(0, Math.min(safeTotal, Number(item?.currentChapter || 0)));
+			const savedChapters = Array.isArray(item?.chapters) ? item.chapters : [];
+			const safeTotal = savedChapters.length > 0
+				? savedChapters.length
+				: Math.max(0, Number(item?.totalChapters ?? 0));
+			const rawCurrent = Number(item?.currentChapter || 0);
+			const safeCurrent = safeTotal === 0
+				? 0
+				: Math.max(0, Math.min(safeTotal, rawCurrent));
 			return {
 				...item,
-				chapters,
+				chapters: savedChapters,
 				totalChapters: safeTotal,
 				currentChapter: safeCurrent,
 			};
@@ -670,7 +1068,8 @@
 	}
 
 	function libraryProgressPercent(book) {
-		const total = Math.max(1, Number(book.totalChapters || 1));
+		const total = Math.max(0, Number(book.totalChapters || 0));
+		if (total === 0) return 0;
 		const current = Math.max(0, Math.min(total, Number(book.currentChapter || 0)));
 		return Math.round((current / total) * 100);
 	}
@@ -695,7 +1094,7 @@
 						<div class="book-title">${escapeLibraryHtml(book.title)}</div>
 						<div class="book-author">${escapeLibraryHtml(book.author)}</div>
 						<span class="status-badge">${escapeLibraryHtml(book.status)}</span>
-						<div class="muted" style="margin-top: 4px;">${book.totalChapters || 1} cap.</div>
+						<div class="muted" style="margin-top: 4px;">${getBookTotalChapters(book)} cap.</div>
 					</div>
 				`).join('')}
 			</div>
@@ -740,7 +1139,7 @@
 								<span>${progress}%</span>
 							</div>
 							<div class="progress-track"><div class="progress-fill" style="width:${progress}%"></div></div>
-							<div class="muted" style="margin-top:6px;">Capítulo ${book.currentChapter || 0} de ${book.totalChapters || 1}</div>
+							<div class="muted" style="margin-top:6px;">Capítulo ${book.currentChapter || 0} de ${getBookTotalChapters(book)}</div>
 						</div>
 
 						<button type="button" class="ghost-btn" style="width:100%; margin-top:12px;" onclick="startReading('${book.id}')">
@@ -761,14 +1160,6 @@
 						: chapters.map((chapter, index) => `
 							<div class="chapter-item" onclick="openLibraryReader('${book.id}', ${index + 1})">
 								<div style="font-size:1.5rem; font-weight:700;"><i class="fa-solid fa-chevron-right" style="font-size:0.95rem; margin-right:8px;"></i>Cap. ${index + 1}: ${escapeLibraryHtml(chapter.title || `Capítulo ${index + 1}`)}</div>
-								<div class="chapter-actions">
-									${!String(chapter.id || '').startsWith('fallback-')
-										? `<button type="button" class="chapter-edit-btn" onclick="event.stopPropagation(); openChapterInEditor('${book.id}', '${chapter.id}')"><i class="fa-solid fa-pen"></i> Editar</button>`
-										: ''}
-									${canManageChapters && !String(chapter.id || '').startsWith('fallback-')
-										? `<button type="button" class="chapter-delete-btn" onclick="event.stopPropagation(); deleteLibraryChapter('${book.id}', '${chapter.id}')"><i class="fa-solid fa-trash"></i></button>`
-										: ''}
-								</div>
 							</div>
 						`).join('')}
 				</div>
@@ -806,39 +1197,25 @@
 		window.location.href = editorUrl.toString();
 	}
 
-	function deleteLibraryChapter(bookId, chapterId) {
+	async function deleteLibraryChapter(bookId, chapterId) {
 		if (!libraryIsAdmin()) return;
 		if (!confirm('¿Eliminar este capítulo?')) return;
 
-		const books = getLibraryBooks();
-		const index = books.findIndex(item => item.id === bookId);
-		if (index === -1) return;
-
-		const currentChapters = getBookChapters(books[index]);
-		const nextChapters = currentChapters.filter(item => item.id !== chapterId);
-		const nextTotal = Math.max(1, nextChapters.length);
-
-		books[index] = {
-			...books[index],
-			chapters: nextChapters,
-			totalChapters: nextTotal,
-			currentChapter: Math.max(0, Math.min(Number(books[index].currentChapter || 0), nextTotal)),
-		};
-
-		setLibraryBooks(books);
-		openLibraryDetail(bookId);
+		try {
+			await libraryApi(`/biblioteca/libros/${bookId}/asignaciones/${chapterId}`, {
+				method: 'DELETE',
+			});
+			await loadLibraryBooksFromApi();
+			openLibraryDetail(bookId);
+		} catch (error) {
+			alert(error.message || 'No se pudo eliminar el capítulo.');
+		}
 	}
 
 	function getReadableChapters(book) {
 		const chapters = getBookChapters(book);
 		if (chapters.length > 0) return chapters;
-
-		const fallbackTotal = Math.max(1, Number(book.totalChapters || 1));
-		return Array.from({ length: fallbackTotal }, (_, index) => ({
-			id: `fallback-${book.id}-${index + 1}`,
-			title: `Capítulo ${index + 1}`,
-			content: '',
-		}));
+		return [];
 	}
 
 	function updateBookCurrentChapter(bookId, chapterNumber) {
@@ -849,8 +1226,10 @@
 		const chaptersLen = getReadableChapters(books[index]).length;
 		books[index] = {
 			...books[index],
-			totalChapters: Math.max(1, chaptersLen),
-			currentChapter: Math.max(1, Math.min(chaptersLen, chapterNumber)),
+			totalChapters: Math.max(0, chaptersLen),
+			currentChapter: chaptersLen === 0
+				? 0
+				: Math.max(1, Math.min(chaptersLen, chapterNumber)),
 		};
 
 		setLibraryBooks(books);
@@ -868,6 +1247,10 @@
 		if (!book) return;
 
 		const chapters = getReadableChapters(book);
+		if (chapters.length === 0) {
+			alert('Este libro aún no tiene capítulos para leer.');
+			return;
+		}
 		const fallbackCurrent = Number(book.currentChapter || 0) > 0 ? Number(book.currentChapter) : 1;
 		const requested = Number(chapterNumber || fallbackCurrent || 1);
 		const safeChapterNumber = Math.max(1, Math.min(chapters.length, requested));
@@ -880,18 +1263,17 @@
 		body.innerHTML = `
 			<div class="reader-shell">
 				<div class="reader-top">
-					<button type="button" class="ghost-btn" onclick="openLibraryDetail('${book.id}')"><i class="fa-solid fa-arrow-left"></i> Cerrar</button>
+					<button type="button" class="ghost-btn reader-back-btn" onclick="openLibraryDetail('${book.id}')"><i class="fa-solid fa-arrow-left"></i> <span class="reader-btn-label">Cerrar</span></button>
 					<div class="reader-title">
 						<div style="font-size:1.1rem;">
 						${escapeLibraryHtml(book.title)}
-							<span class="muted">Cap. ${safeChapterNumber}: ${escapeLibraryHtml(chapter.title || `Capítulo ${safeChapterNumber}`)}</span>
 						</div>
 					</div>
-					<div style="display:flex; gap:8px; justify-content:flex-end;">
+					<div class="reader-top-actions">
 						${libraryIsAdmin()
-							? `<button type="button" class="chapter-edit-btn" onclick="openChapterInEditor('${book.id}', '${chapter.id}')"><i class="fa-solid fa-pen"></i> Editar capítulo</button>`
+							? `<button type="button" class="chapter-edit-btn reader-edit-btn" onclick="openChapterInEditor('${book.id}', '${chapter.id}')"><i class="fa-solid fa-pen"></i> <span class="reader-btn-label">Editar capítulo</span></button>`
 							: ''}
-						<button type="button" class="primary-btn" style="background:#b7986a;" onclick="toggleReaderCaps()"><i class="fa-solid fa-list"></i> Caps</button>
+						<button type="button" class="primary-btn reader-caps-btn" style="background:#b7986a;" onclick="toggleReaderCaps()"><i class="fa-solid fa-list"></i> <span class="reader-btn-label">Caps</span></button>
 					</div>
 				</div>
 
@@ -915,11 +1297,11 @@
 
 				<div class="reader-bottom">
 					<div>
-						<button type="button" class="reader-nav-btn" ${safeChapterNumber <= 1 ? 'disabled' : ''} onclick="openLibraryReader('${book.id}', ${safeChapterNumber - 1})"><i class="fa-solid fa-chevron-left"></i> Anterior</button>
+						<button type="button" class="reader-nav-btn" ${safeChapterNumber <= 1 ? 'disabled' : ''} onclick="openLibraryReader('${book.id}', ${safeChapterNumber - 1})"><i class="fa-solid fa-chevron-left"></i> <span class="reader-btn-label">Anterior</span></button>
 					</div>
-					<div style="font-size:1.8rem; font-weight:800; text-align:center;">${safeChapterNumber} / ${chapters.length}</div>
+					<div style="font-size:1.25rem; font-weight:800; text-align:center;">${safeChapterNumber} / ${chapters.length}</div>
 					<div style="text-align:right;">
-						<button type="button" class="reader-nav-btn" ${safeChapterNumber >= chapters.length ? 'disabled' : ''} onclick="openLibraryReader('${book.id}', ${safeChapterNumber + 1})">Siguiente <i class="fa-solid fa-chevron-right"></i></button>
+						<button type="button" class="reader-nav-btn" ${safeChapterNumber >= chapters.length ? 'disabled' : ''} onclick="openLibraryReader('${book.id}', ${safeChapterNumber + 1})"><span class="reader-btn-label">Siguiente</span> <i class="fa-solid fa-chevron-right"></i></button>
 					</div>
 				</div>
 			</div>
@@ -1025,72 +1407,75 @@
 			return;
 		}
 
-		const books = getLibraryBooks();
-		let cover = '';
+		try {
+			const books = getLibraryBooks();
+			const existingBook = books.find(item => item.id === editingLibraryBookId);
+			const cover = coverFile
+				? await fileToLibraryDataURL(coverFile)
+				: (existingBook?.cover || null);
 
-		if (editingLibraryBookId) {
-			const index = books.findIndex(item => item.id === editingLibraryBookId);
-			if (index === -1) return;
-			const totalChapters = Math.max(1, Number(books[index].totalChapters || 1));
-
-			cover = books[index].cover || '';
-			if (coverFile) cover = await fileToLibraryDataURL(coverFile);
-
-			books[index] = {
-				...books[index],
+			const payload = {
 				title,
 				author,
-				synopsis,
+				description: synopsis,
 				status,
-				totalChapters,
-				currentChapter: Math.min(Number(books[index].currentChapter || 0), totalChapters),
-				cover,
+				cover_path: cover,
 			};
 
-			setLibraryBooks(books);
+			if (editingLibraryBookId) {
+				await libraryApi(`/biblioteca/libros/${editingLibraryBookId}`, {
+					method: 'PUT',
+					body: JSON.stringify(payload),
+				});
+			} else {
+				await libraryApi('/biblioteca/libros', {
+					method: 'POST',
+					body: JSON.stringify(payload),
+				});
+			}
+
+			await loadLibraryBooksFromApi();
 			closeLibraryForm();
-			openLibraryDetail(books[index].id);
-			return;
+
+			if (editingLibraryBookId) {
+				openLibraryDetail(editingLibraryBookId);
+				return;
+			}
+
+			renderLibraryHome();
+		} catch (error) {
+			alert(error.message || 'No se pudo guardar el libro.');
 		}
-
-		if (coverFile) {
-			cover = await fileToLibraryDataURL(coverFile);
-		} else {
-			cover = 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=600&q=80';
-		}
-
-		books.push({
-			id: `book-${Date.now()}`,
-			title,
-			author,
-			synopsis,
-			status,
-			totalChapters: 1,
-			currentChapter: 0,
-			cover,
-			chapters: [],
-		});
-
-		setLibraryBooks(books);
-		closeLibraryForm();
-		renderLibraryHome();
 	}
 
-	function confirmDeleteLibraryBook(bookId) {
+	async function confirmDeleteLibraryBook(bookId) {
 		if (!confirm('¿Eliminar este libro?')) return;
-		const books = getLibraryBooks().filter(item => item.id !== bookId);
-		setLibraryBooks(books);
-		renderLibraryHome();
+
+		try {
+			await libraryApi(`/biblioteca/libros/${bookId}`, {
+				method: 'DELETE',
+			});
+			await loadLibraryBooksFromApi();
+			renderLibraryHome();
+		} catch (error) {
+			alert(error.message || 'No se pudo eliminar el libro.');
+		}
 	}
 
-	function deleteLibraryBook() {
+	async function deleteLibraryBook() {
 		if (!editingLibraryBookId) return;
 		if (!confirm('¿Eliminar este libro?')) return;
 
-		const books = getLibraryBooks().filter(item => item.id !== editingLibraryBookId);
-		setLibraryBooks(books);
-		closeLibraryForm();
-		renderLibraryHome();
+		try {
+			await libraryApi(`/biblioteca/libros/${editingLibraryBookId}`, {
+				method: 'DELETE',
+			});
+			await loadLibraryBooksFromApi();
+			closeLibraryForm();
+			renderLibraryHome();
+		} catch (error) {
+			alert(error.message || 'No se pudo eliminar el libro.');
+		}
 	}
 
 	function openLibraryFloating() {
@@ -1235,7 +1620,8 @@
 
 	window.addEventListener('resize', clampLibraryIntoViewport);
 
-	function bootstrapLibrary() {
+	async function bootstrapLibrary() {
+		await loadLibraryBooksFromApi();
 		renderLibraryHome();
 		openLibraryFloating();
 

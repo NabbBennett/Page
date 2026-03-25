@@ -373,7 +373,7 @@
         border-radius: 0.7rem;
         background: rgba(255, 255, 255, 0.04);
         display: grid;
-        grid-template-columns: 44px 58px 1.5fr 1fr 64px auto auto;
+        grid-template-columns: 40px 80px 1fr 1fr 64px auto auto;
         gap: 0.7rem;
         align-items: center;
         padding: 0.55rem 0.7rem;
@@ -389,8 +389,8 @@
     }
 
     #musicModal .track-thumb {
-        width: 58px;
-        height: 58px;
+        width: 65px;
+        height: 65px;
         border-radius: 0.45rem;
         object-fit: cover;
         border: 1px solid rgba(255, 255, 255, 0.14);
@@ -422,7 +422,7 @@
         padding: 0.55rem 0.8rem;
         display: grid;
         grid-template-columns: minmax(210px, 0.95fr) minmax(320px, 1.5fr) auto minmax(130px, 0.6fr);
-        gap: 0.8rem;
+        gap: 1.25rem;
         align-items: center;
         position: relative;
     }
@@ -437,6 +437,33 @@
         align-items: center;
         gap: 0.7rem;
         min-width: 0;
+    }
+
+    #musicModal .player-now-empty-icon {
+        display: none;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        background: rgba(255, 255, 255, 0.12);
+        color: #f7e8d7;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+    }
+
+    #musicModal .player-now.is-empty {
+        justify-content: center;
+    }
+
+    #musicModal .player-now.is-empty .player-now-thumb,
+    #musicModal .player-now.is-empty .player-now-meta {
+        display: none;
+    }
+
+    #musicModal .player-now.is-empty .player-now-empty-icon {
+        display: inline-flex;
     }
 
     #musicModal .player-now-thumb {
@@ -455,14 +482,14 @@
 
     #musicModal .player-now-meta #musicNowTitle {
         color: #fff !important;
-        font-size: 0.76rem;
+        font-size: 1.5rem;
         font-weight: 700;
         line-height: 1.2;
     }
 
     #musicModal .player-now-meta #musicNowAuthor {
         color: #d8c3b5;
-        font-size: 0.64rem;
+        font-size: 1rem;
         margin-top: 0.08rem;
     }
 
@@ -800,7 +827,7 @@
         #musicModal .hero-actions { display: none; }
         #musicModal .track-row,
         #musicModal .tracks-head {
-            grid-template-columns: 38px 46px 1fr auto auto;
+            grid-template-columns: 35px 80px 1fr auto auto;
         }
         #musicModal .track-album,
         #musicModal .track-duration,
@@ -813,9 +840,9 @@
         }
 
         #musicModal .player-now { gap: 0.45rem; }
-        #musicModal .player-now-thumb { width: 36px; height: 36px; }
-        #musicModal .player-now-meta #musicNowTitle { font-size: 0.67rem; }
-        #musicModal .player-now-meta #musicNowAuthor { font-size: 0.58rem; }
+        #musicModal .player-now-thumb { width: 70px; height: 70px; }
+        #musicModal .player-now-meta #musicNowTitle { font-size: 1.25rem; }
+        #musicModal .player-now-meta #musicNowAuthor { font-size: 1.25rem; }
 
         #musicModal .player-btn { width: 24px; height: 24px; }
         #musicModal .player-btn.primary { width: 30px; height: 30px; }
@@ -843,8 +870,243 @@
         #musicModal .player-controls { grid-area: controls; }
         #musicModal .player-buttons { grid-area: buttons; justify-content: center; }
         #musicModal .player-volume { grid-area: volume; max-width: 92px; justify-self: end; }
-
+        #musicModal .player-now-thumb { width: 50px; height: 50px; }
         #musicModal .player-now-meta #musicNowAuthor { display: none; }
+    }
+
+    @media (max-width: 768px) {
+        #musicModal .music-app-window {
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: calc(100vh - 72px);
+            transform: none;
+            border-radius: 0;
+            resize: none;
+        }
+
+        #musicModal .resize-handle {
+            display: none;
+        }
+
+        #musicModal .music-window-body {
+            grid-template-columns: 72px 1fr;
+        }
+
+        #musicModal .music-sidebar {
+            padding: 0.6rem 0.45rem;
+        }
+
+        #musicModal .sidebar-logo,
+        #musicModal .sidebar-brand,
+        #musicModal .sidebar-nav-btn span,
+        #musicModal .sidebar-section-title,
+        #musicModal .sidebar-meta-row,
+        #musicModal #musicGuestHint,
+        #musicModal .playlist-item .min-w-0 {
+            display: none;
+        }
+
+        #musicModal .sidebar-head {
+            justify-content: center;
+        }
+
+        #musicModal .sidebar-toggle-btn {
+            display: none;
+        }
+
+        #musicModal .sidebar-nav {
+            justify-items: center;
+            margin-top: 0.55rem;
+        }
+
+        #musicModal .sidebar-nav-btn {
+            width: 42px;
+            height: 42px;
+            justify-content: center;
+            padding: 0;
+            border-radius: 0.6rem;
+        }
+
+        #musicModal .playlist-list {
+            justify-items: center;
+            margin-top: 0.4rem;
+        }
+
+        #musicModal .playlist-item {
+            width: 56px;
+            grid-template-columns: 1fr;
+            justify-items: center;
+            padding: 0.35rem;
+            gap: 0;
+        }
+
+        #musicModal .playlist-cover {
+            width: 48px;
+            height: 48px;
+        }
+
+        #musicModal .music-hero {
+            grid-template-columns: 96px 1fr;
+            min-height: 150px;
+            padding: 0.8rem;
+            gap: 0.85rem;
+        }
+
+        #musicModal .cover-large {
+            width: 96px;
+            height: 96px;
+        }
+
+        #musicModal .hero-title {
+            font-size: 1.6rem;
+        }
+
+        #musicModal #musicHeroSubtitle {
+            font-size: 0.9rem;
+        }
+
+        #musicModal .tracks-wrap {
+            padding: 0.55rem;
+        }
+
+        #musicModal .track-row,
+        #musicModal .tracks-head {
+            grid-template-columns: 32px 62px 1fr auto auto;
+            gap: 0.45rem;
+        }
+
+        #musicModal .track-row {
+            min-height: 62px;
+            padding: 0.45rem 0.5rem;
+        }
+
+        #musicModal .track-thumb {
+            width: 52px;
+            height: 52px;
+        }
+    }
+
+    @media (max-width: 560px) {
+        #musicModal .player-area {
+            grid-template-columns: 1fr;
+            grid-template-areas:
+                "now"
+                "controls"
+                "buttons"
+                "volume";
+            gap: 0.5rem;
+            padding: 0.5rem;
+        }
+
+        #musicModal .player-now {
+            justify-self: center;
+        }
+
+        #musicModal .player-volume {
+            justify-self: stretch;
+            max-width: none;
+            grid-template-columns: 20px 1fr;
+        }
+
+        #musicModal .player-now-thumb {
+            width: 42px;
+            height: 42px;
+        }
+
+        #musicModal .player-now-meta #musicNowTitle {
+            font-size: 1.05rem;
+            text-align: center;
+        }
+    }
+
+    @media (max-width: 420px) {
+        #musicModal .music-admin-section {
+            padding: 0.6rem;
+        }
+
+        #musicModal .admin-tabs {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.35rem;
+        }
+
+        #musicModal .admin-tab-btn {
+            width: 100%;
+            text-align: center;
+            padding: 0.48rem 0.55rem;
+            font-size: 0.78rem;
+        }
+
+        #musicModal .admin-box {
+            padding: 0.55rem;
+        }
+
+        #musicModal .cover-picker-preview-shell.playlist-preview {
+            width: min(100%, 150px);
+            height: 150px;
+        }
+
+        #musicModal .cover-picker-meta {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0.45rem;
+        }
+
+        #musicModal .cover-file-name {
+            white-space: normal;
+            overflow-wrap: anywhere;
+            text-overflow: initial;
+        }
+
+        #musicModal .cover-picker-meta > .flex {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.4rem;
+        }
+
+        #musicModal .cover-picker-meta > .flex .btn,
+        #musicModal #adminEditPanel .space-y-2 > .flex .btn {
+            width: 100%;
+        }
+
+        #musicModal #adminEditPanel .space-y-2 > .flex {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.4rem;
+            align-items: stretch;
+        }
+
+        #musicModal .track-row,
+        #musicModal .tracks-head {
+            grid-template-columns: 26px 52px 1fr auto auto;
+        }
+
+        #musicModal .track-thumb {
+            width: 44px;
+            height: 44px;
+        }
+
+        #musicModal .player-buttons {
+            gap: 0.25rem;
+        }
+
+        #musicModal .player-btn {
+            width: 24px;
+            height: 24px;
+        }
+
+        #musicModal .player-btn.primary {
+            width: 30px;
+            height: 30px;
+        }
+
+        #musicModal .player-now.is-empty .player-now-empty-icon {
+            width: 44px;
+            height: 44px;
+            font-size: 1.15rem;
+        }
     }
 </style>
 
@@ -914,6 +1176,7 @@
 
                 <div class="player-area">
                     <div class="player-now">
+                        <div id="musicNowEmptyIcon" class="player-now-empty-icon" aria-hidden="true"><i class="fas fa-music"></i></div>
                         <img id="musicNowThumb" class="player-now-thumb" src="https://via.placeholder.com/120x120.png?text=%E2%99%AA" alt="cover">
                         <div class="player-now-meta">
                             <div id="musicNowTitle" class="text-lg font-extrabold truncate" style="color:#f7e8d7;">Sin canción</div>
@@ -1047,9 +1310,6 @@
                             </div>
                             <div id="trackPreviewBox" class="muted"></div>
                         </div>
-
-                        <div class="font-semibold mt-3 mb-2">Quitar canciones de playlist</div>
-                        <div id="adminTrackList" class="admin-track-list"></div>
                     </div>
                 </div>
             </div>
@@ -1080,6 +1340,8 @@
     let activePlaylistId = null;
     let activeTrackId = null;
     let loadedTrackId = null;
+    let playbackPlaylistId = null;
+    let currentPlayingTrack = null;
     let isMusicSidebarCollapsed = false;
     let musicViewMode = 'home';
     let adminPanelTab = 'create';
@@ -1157,6 +1419,18 @@
         return (playlist.tracks || []).find(item => item.id === activeTrackId) || null;
     }
 
+    function getPlaylistById(playlistId) {
+        return musicPlaylists.find(item => item.id === Number(playlistId)) || null;
+    }
+
+    function getCurrentNowPlayingTrack() {
+        return currentPlayingTrack || getActiveTrack();
+    }
+
+    function getPlaybackPlaylist() {
+        return getPlaylistById(playbackPlaylistId) || getActivePlaylist();
+    }
+
     function getActivePlaylistTracks() {
         return Array.isArray(getActivePlaylist()?.tracks) ? getActivePlaylist().tracks : [];
     }
@@ -1173,12 +1447,27 @@
         return `${mins}:${String(secs).padStart(2, '0')}`;
     }
 
+    const DEFAULT_TRACK_COVER = '/storage/photo/NABBLOGO_BLANCO.png';
+
+    function emitMiniPlayerState() {
+        const track = getCurrentNowPlayingTrack();
+        sendMusicMessage('miniState', {
+            track: track ? {
+                title: track.title || 'Sin título',
+                artist: track.artist || 'Autor desconocido',
+                cover: resolveTrackCover(track),
+            } : null,
+            isPlaying: !!(musicAudioPlayer && !musicAudioPlayer.paused && !musicAudioPlayer.ended),
+        });
+    }
+
     function updatePlayPauseButton(isPlaying) {
         const btn = document.getElementById('musicPlayPauseBtn');
         if (!btn) return;
         btn.innerHTML = isPlaying
             ? '<i class="fa-solid fa-pause"></i>'
             : '<i class="fa-solid fa-play"></i>';
+        emitMiniPlayerState();
     }
 
     function updateModeButtons() {
@@ -1187,8 +1476,8 @@
     }
 
     function resolveTrackCover(track) {
-        if (!track) return 'https://via.placeholder.com/120x120.png?text=%E2%99%AA';
-        return track.thumbnail_url || 'https://via.placeholder.com/120x120.png?text=%E2%99%AA';
+        if (!track) return DEFAULT_TRACK_COVER;
+        return track.thumbnail_url || DEFAULT_TRACK_COVER;
     }
 
     function getEditPlaylist() {
@@ -1230,19 +1519,27 @@
         const title = document.getElementById('musicNowTitle');
         const author = document.getElementById('musicNowAuthor');
         const thumb = document.getElementById('musicNowThumb');
+        const nowWrap = document.querySelector('#musicModal .player-now');
+        const emptyIcon = document.getElementById('musicNowEmptyIcon');
 
-        if (!title || !author || !thumb) return;
+        if (!title || !author || !thumb || !nowWrap) return;
 
         if (!track) {
             title.textContent = 'Sin canción';
             author.textContent = 'Selecciona una canción para reproducir.';
-            thumb.src = 'https://via.placeholder.com/120x120.png?text=%E2%99%AA';
+            thumb.removeAttribute('src');
+            nowWrap.classList.add('is-empty');
+            if (emptyIcon) emptyIcon.setAttribute('aria-hidden', 'false');
+            emitMiniPlayerState();
             return;
         }
 
+        nowWrap.classList.remove('is-empty');
+        if (emptyIcon) emptyIcon.setAttribute('aria-hidden', 'true');
         thumb.src = resolveTrackCover(track);
         title.textContent = track.title || 'Sin título';
         author.textContent = track.artist || 'Autor desconocido';
+        emitMiniPlayerState();
     }
 
     function updateProgressUI() {
@@ -1311,21 +1608,29 @@
         updateProgressUI();
     }
 
-    function playTrackById(trackId, autoplay = true) {
-        const playlist = getActivePlaylist();
+    function playTrackById(trackId, autoplay = true, sourcePlaylistId = activePlaylistId) {
+        const playlist = getPlaylistById(sourcePlaylistId);
         if (!playlist) return;
         const track = (playlist.tracks || []).find(item => item.id === Number(trackId));
         if (!track) return;
 
-        activeTrackId = track.id;
-        renderTrackList();
+        playbackPlaylistId = playlist.id;
+        currentPlayingTrack = track;
+
+        if (activePlaylistId === playlist.id) {
+            activeTrackId = track.id;
+            renderTrackList();
+        }
+
         updateNowPlayingText(track);
         loadTrackIntoPlayer(track, autoplay);
     }
 
     function playNextTrackInPlaylist() {
-        const tracks = getActivePlaylistTracks();
-        const index = getActiveTrackIndex();
+        const playlist = getPlaybackPlaylist();
+        const tracks = Array.isArray(playlist?.tracks) ? playlist.tracks : [];
+        const currentTrackId = Number(currentPlayingTrack?.id || activeTrackId || 0);
+        const index = tracks.findIndex(item => item.id === currentTrackId);
         if (index < 0 || tracks.length === 0) return;
 
         if (isShuffleEnabled && tracks.length > 1) {
@@ -1333,23 +1638,25 @@
             while (randomIndex === index) {
                 randomIndex = Math.floor(Math.random() * tracks.length);
             }
-            playTrackById(tracks[randomIndex].id, true);
+            playTrackById(tracks[randomIndex].id, true, playlist.id);
             return;
         }
 
         const nextTrack = tracks[index + 1];
         if (!nextTrack) {
             if (isRepeatEnabled) {
-                playTrackById(tracks[0].id, true);
+                playTrackById(tracks[0].id, true, playlist.id);
             }
             return;
         }
-        playTrackById(nextTrack.id, true);
+        playTrackById(nextTrack.id, true, playlist.id);
     }
 
     function playPreviousTrackInPlaylist() {
-        const tracks = getActivePlaylistTracks();
-        const index = getActiveTrackIndex();
+        const playlist = getPlaybackPlaylist();
+        const tracks = Array.isArray(playlist?.tracks) ? playlist.tracks : [];
+        const currentTrackId = Number(currentPlayingTrack?.id || activeTrackId || 0);
+        const index = tracks.findIndex(item => item.id === currentTrackId);
         if (index < 0 || tracks.length === 0) return;
 
         if (isShuffleEnabled && tracks.length > 1) {
@@ -1357,18 +1664,18 @@
             while (randomIndex === index) {
                 randomIndex = Math.floor(Math.random() * tracks.length);
             }
-            playTrackById(tracks[randomIndex].id, true);
+            playTrackById(tracks[randomIndex].id, true, playlist.id);
             return;
         }
 
         const prevTrack = tracks[index - 1];
         if (!prevTrack) {
             if (isRepeatEnabled) {
-                playTrackById(tracks[tracks.length - 1].id, true);
+                playTrackById(tracks[tracks.length - 1].id, true, playlist.id);
             }
             return;
         }
-        playTrackById(prevTrack.id, true);
+        playTrackById(prevTrack.id, true, playlist.id);
     }
 
     function toggleShuffleMode() {
@@ -1382,11 +1689,11 @@
     }
 
     function togglePlayPause() {
-        const track = getActiveTrack();
+        const track = getCurrentNowPlayingTrack();
         if (!track || !musicAudioPlayer) return;
 
         if (!musicAudioPlayer.src) {
-            playTrackById(track.id, true);
+            playTrackById(track.id, true, playbackPlaylistId || activePlaylistId);
             return;
         }
 
@@ -1581,6 +1888,12 @@
                 activeTrackId = tracks[0]?.id ?? null;
             }
 
+            if (playbackPlaylistId) {
+                const playbackPlaylist = getPlaylistById(playbackPlaylistId);
+                const refreshedTrack = (playbackPlaylist?.tracks || []).find(item => item.id === currentPlayingTrack?.id) || null;
+                currentPlayingTrack = refreshedTrack || currentPlayingTrack;
+            }
+
             renderMusicUI();
         } catch (error) {
             alert(error.message);
@@ -1705,7 +2018,7 @@
     }
 
     function renderNowPlaying() {
-        const track = getActiveTrack();
+        const track = getCurrentNowPlayingTrack();
 
         if (!track) {
             loadedTrackId = null;
@@ -1731,7 +2044,7 @@
     function playActiveTrack() {
         const track = getActiveTrack();
         if (!track) return;
-        playTrackById(track.id, true);
+        playTrackById(track.id, true, activePlaylistId);
     }
 
     function renderAdminState() {
@@ -1767,6 +2080,8 @@
 
     function selectTrack(trackId) {
         activeTrackId = Number(trackId);
+        playbackPlaylistId = activePlaylistId;
+        currentPlayingTrack = getActiveTrack();
         renderTrackList();
         renderNowPlaying();
     }
@@ -2060,7 +2375,7 @@
         }
 
         if (fileName) fileName.textContent = file.name;
-        if (preview) setPreviewImage('trackAudioPreview', 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="320"><rect width="100%" height="100%" fill="%23261e1d"/><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" fill="%23d8b88f" font-size="34" font-family="Arial">MP3 listo para subir</text></svg>');
+        if (preview) setPreviewImage('trackAudioPreview', '');
     }
 
     async function createTrackFromUpload() {
@@ -2223,6 +2538,14 @@
             openMusicFloating();
         } else if (event.data.type === 'openMaximized') {
             openMusicMaximized();
+        } else if (event.data.type === 'miniControl') {
+            if (event.data.action === 'playPause') {
+                togglePlayPause();
+            } else if (event.data.action === 'next') {
+                playNextTrackInPlaylist();
+            } else if (event.data.action === 'prev') {
+                playPreviousTrackInPlaylist();
+            }
         }
     });
 

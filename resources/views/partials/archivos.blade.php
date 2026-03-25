@@ -348,6 +348,100 @@
 	}
 
 	#filesModal .hidden-file-input { display: none; }
+
+	@media (max-width: 900px) {
+		#filesModal .top-bar {
+			grid-template-columns: 1fr auto auto;
+		}
+
+		#filesModal .folders-grid {
+			grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+		}
+
+		#filesModal .folder-name {
+			font-size: 1.4rem;
+		}
+	}
+
+	@media (max-width: 768px) {
+		#filesModal .files-window {
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: calc(100vh - 72px);
+			transform: none;
+			border-radius: 0;
+			resize: none;
+		}
+
+		#filesModal .resize-handle {
+			display: none;
+		}
+
+		#filesModal .top-bar {
+			grid-template-columns: 1fr;
+		}
+
+		#filesModal .top-bar .ghost-btn,
+		#filesModal .top-bar .primary-btn,
+		#filesModal .top-bar .icon-btn {
+			width: 100%;
+			height: 44px;
+		}
+
+		#filesModal .toolbar-title {
+			font-size: 1.5rem;
+			margin: 14px 14px 8px;
+		}
+
+		#filesModal .folders-grid,
+		#filesModal .folder-files-list,
+		#filesModal .viewer-wrap {
+			padding: 12px;
+		}
+
+		#filesModal .file-row {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 8px;
+		}
+
+		#filesModal .folder-tools-grid,
+		#filesModal .modal-actions,
+		#filesModal .remove-file-item {
+			grid-template-columns: 1fr;
+		}
+
+		#filesModal .modal-box {
+			padding: 12px;
+			width: calc(100% - 12px);
+			max-height: calc(100% - 12px);
+		}
+	}
+
+	@media (max-width: 420px) {
+		#filesModal .top-bar .ghost-btn,
+		#filesModal .top-bar .primary-btn {
+			font-size: 0;
+			padding: 0;
+		}
+
+		#filesModal .top-bar .ghost-btn i,
+		#filesModal .top-bar .primary-btn i {
+			font-size: 1rem;
+			margin: 0;
+		}
+
+		#filesModal .folder-card {
+			min-height: 150px;
+		}
+
+		#filesModal .folder-icon {
+			width: 68px;
+			height: 68px;
+			font-size: 1.6rem;
+		}
+	}
 </style>
 
 <div class="files-window" id="filesWindow">
@@ -469,7 +563,7 @@
 	const FILES_MIN_WIDTH = 320;
 	const FILES_MIN_HEIGHT = 240;
 	const FILES_USER_ROLE = @json($userType ?? 'guest');
-	const FILES_STORAGE_KEY = `files_app_v1_${FILES_USER_ROLE}`;
+	const FILES_CSRF = @json(csrf_token());
 
 	let isFilesMaximized = false;
 	let isFilesDragging = false;
@@ -486,35 +580,12 @@
 	let currentViewingFileId = null;
 	let pendingUnlockFileId = null;
 	let editingFolderId = null;
+	let filesDataCache = { folders: [], files: [] };
 	const unlockedFiles = new Set();
 
 	const filesWindow = document.getElementById('filesWindow');
 	const filesResizeHandle = document.getElementById('filesResizeHandle');
 	const filesHeader = filesWindow.querySelector('.window-header');
-
-	const defaultFilesData = {
-		folders: [
-			{ id: 'folder-1', name: 'Dribbble' },
-			{ id: 'folder-2', name: 'Behance' },
-			{ id: 'folder-3', name: 'Artstation' },
-		],
-		files: [
-			{
-				id: 'file-1',
-				folderId: 'folder-1',
-				name: 'Mockup.png',
-				image: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=900&q=80',
-				password: null,
-			},
-			{
-				id: 'file-2',
-				folderId: 'folder-1',
-				name: 'Portfolio Secreto.png',
-				image: 'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=900&q=80',
-				password: '1234',
-			}
-		]
-	};
 
 	function sendFilesMessage(type, extra = {}) {
 		const payload = { app: 'files', type, ...extra };
@@ -525,17 +596,70 @@
 		}
 	}
 
-	function getFilesData() {
-		const raw = localStorage.getItem(FILES_STORAGE_KEY);
-		if (!raw) {
-			localStorage.setItem(FILES_STORAGE_KEY, JSON.stringify(defaultFilesData));
-			return JSON.parse(JSON.stringify(defaultFilesData));
+	async function filesApi(url, options = {}) {
+		const headers = {
+			'Accept': 'application/json',
+			'X-Requested-With': 'XMLHttpRequest',
+			...options.headers,
+		};
+
+		if (options.body && !(options.body instanceof FormData)) {
+			headers['Content-Type'] = 'application/json';
+			headers['X-CSRF-TOKEN'] = FILES_CSRF;
 		}
-		return JSON.parse(raw);
+
+		if ((options.method || 'GET').toUpperCase() !== 'GET' && !headers['X-CSRF-TOKEN']) {
+			headers['X-CSRF-TOKEN'] = FILES_CSRF;
+		}
+
+		const response = await fetch(url, {
+			credentials: 'same-origin',
+			...options,
+			headers,
+		});
+
+		const data = await response.json().catch(() => ({}));
+		if (!response.ok) {
+			throw new Error(data?.message || 'No se pudo completar la operación.');
+		}
+
+		return data;
+	}
+
+	async function loadFilesDataFromApi() {
+		const [foldersRes, writingsRes] = await Promise.all([
+			filesApi('/archivos/carpetas'),
+			filesApi('/archivos/escritos'),
+		]);
+
+		const folders = Array.isArray(foldersRes?.folders)
+			? foldersRes.folders.map(folder => ({
+				id: String(folder.id),
+				name: folder.name || 'Sin nombre',
+			}))
+			: [];
+
+		const files = Array.isArray(writingsRes?.writings)
+			? writingsRes.writings.map(writing => ({
+				id: String(writing.id),
+				folderId: writing.folder_id ? String(writing.folder_id) : null,
+				name: writing.title || 'Sin título',
+				image: writing.image_path || '',
+				password: writing.password || null,
+				textContent: writing.text_content || '',
+				htmlContent: writing.html_content || '',
+			}))
+			: [];
+
+		filesDataCache = { folders, files };
+	}
+
+	function getFilesData() {
+		return filesDataCache;
 	}
 
 	function setFilesData(data) {
-		localStorage.setItem(FILES_STORAGE_KEY, JSON.stringify(data));
+		filesDataCache = data;
 	}
 
 	function escapeFilesHtml(text) {
@@ -585,7 +709,8 @@
 		renderFolderGrid();
 	}
 
-	function refreshFilesView() {
+	async function refreshFilesView() {
+		await loadFilesDataFromApi();
 		if (currentViewingFileId) {
 			openFileViewer(currentViewingFileId);
 			return;
@@ -662,7 +787,7 @@
 			: '<div class="muted">No hay archivos para quitar.</div>';
 	}
 
-	function saveEditFolderName() {
+	async function saveEditFolderName() {
 		if (!editingFolderId) return;
 		const input = document.getElementById('editFolderNameInput');
 		if (!input) return;
@@ -674,22 +799,26 @@
 		}
 
 		const data = getFilesData();
-		const folder = data.folders.find(item => item.id === editingFolderId);
-		if (!folder) return;
-
 		const exists = data.folders.some(item => item.id !== editingFolderId && item.name.toLowerCase() === newName.toLowerCase());
 		if (exists) {
 			alert('Ya existe una carpeta con ese nombre.');
 			return;
 		}
 
-		folder.name = newName;
-		setFilesData(data);
-		openFolder(editingFolderId);
-		document.getElementById('editFolderNameInput').value = newName;
+		try {
+			await filesApi(`/archivos/carpetas/${editingFolderId}`, {
+				method: 'PUT',
+				body: JSON.stringify({ name: newName }),
+			});
+			await loadFilesDataFromApi();
+			openFolder(editingFolderId);
+			document.getElementById('editFolderNameInput').value = newName;
+		} catch (error) {
+			alert(error.message || 'No se pudo actualizar la carpeta.');
+		}
 	}
 
-	function removeFileFromEditModal(fileId) {
+	async function removeFileFromEditModal(fileId) {
 		if (!editingFolderId) return;
 		const data = getFilesData();
 		const file = data.files.find(item => item.id === fileId && item.folderId === editingFolderId);
@@ -698,17 +827,21 @@
 		const ok = confirm(`¿Quitar el archivo "${file.name}"?`);
 		if (!ok) return;
 
-		data.files = data.files.filter(item => item.id !== fileId);
-		unlockedFiles.delete(fileId);
-		if (currentViewingFileId === fileId) {
-			currentViewingFileId = null;
+		try {
+			await filesApi(`/archivos/escritos/${fileId}`, { method: 'DELETE' });
+			unlockedFiles.delete(fileId);
+			if (currentViewingFileId === fileId) {
+				currentViewingFileId = null;
+			}
+			await loadFilesDataFromApi();
+			openFolder(editingFolderId);
+			renderEditFolderFilesList();
+		} catch (error) {
+			alert(error.message || 'No se pudo eliminar el archivo.');
 		}
-		setFilesData(data);
-		openFolder(editingFolderId);
-		renderEditFolderFilesList();
 	}
 
-	function deleteFolderFromEditModal() {
+	async function deleteFolderFromEditModal() {
 		if (!editingFolderId) return;
 		const data = getFilesData();
 		const folder = data.folders.find(item => item.id === editingFolderId);
@@ -718,15 +851,17 @@
 		const ok = confirm(`¿Eliminar la carpeta "${folder.name}" y ${folderFiles.length} archivo(s)?`);
 		if (!ok) return;
 
-		data.folders = data.folders.filter(item => item.id !== editingFolderId);
-		data.files = data.files.filter(item => item.folderId !== editingFolderId);
-		folderFiles.forEach(file => unlockedFiles.delete(file.id));
-
-		setFilesData(data);
-		closeEditFolderModal();
-		currentFolderId = null;
-		currentViewingFileId = null;
-		renderFolderGrid();
+		try {
+			await filesApi(`/archivos/carpetas/${editingFolderId}`, { method: 'DELETE' });
+			folderFiles.forEach(file => unlockedFiles.delete(file.id));
+			await loadFilesDataFromApi();
+			closeEditFolderModal();
+			currentFolderId = null;
+			currentViewingFileId = null;
+			renderFolderGrid();
+		} catch (error) {
+			alert(error.message || 'No se pudo eliminar la carpeta.');
+		}
 	}
 
 	function openFileById(fileId) {
@@ -797,7 +932,7 @@
 		document.getElementById('createFolderModal').classList.remove('active');
 	}
 
-	function saveFolder() {
+	async function saveFolder() {
 		const name = document.getElementById('folderNameInput').value.trim();
 		if (!name) {
 			alert('Ingresa un nombre para la carpeta.');
@@ -811,10 +946,17 @@
 			return;
 		}
 
-		data.folders.push({ id: `folder-${Date.now()}`, name });
-		setFilesData(data);
-		closeCreateFolderModal();
-		renderFolderGrid();
+		try {
+			await filesApi('/archivos/carpetas', {
+				method: 'POST',
+				body: JSON.stringify({ name }),
+			});
+			await loadFilesDataFromApi();
+			closeCreateFolderModal();
+			renderFolderGrid();
+		} catch (error) {
+			alert(error.message || 'No se pudo crear la carpeta.');
+		}
 	}
 
 	function triggerUploadImageInput() {
@@ -841,10 +983,15 @@
 		document.getElementById('uploadPasswordInput').style.display = checked ? 'block' : 'none';
 	}
 
-	function openUploadImageModal(preselectedFolderId = null) {
+	async function openUploadImageModal(preselectedFolderId = null) {
+		await loadFilesDataFromApi();
 		const data = getFilesData();
 		const select = document.getElementById('uploadFolderSelect');
 		select.innerHTML = data.folders.map(folder => `<option value="${folder.id}">${escapeFilesHtml(folder.name)}</option>`).join('');
+		if (!data.folders.length) {
+			alert('Primero crea una carpeta en Archivos.');
+			return;
+		}
 		if (preselectedFolderId) select.value = preselectedFolderId;
 
 		document.getElementById('uploadImageInput').value = '';
@@ -887,22 +1034,29 @@
 			return;
 		}
 
-		const dataUrl = await fileToDataURL(imageFile);
-		const data = getFilesData();
-		data.files.push({
-			id: `file-${Date.now()}`,
-			folderId,
-			name,
-			image: dataUrl,
-			password: protectedFile ? password : null,
-		});
-		setFilesData(data);
+		try {
+			const dataUrl = await fileToDataURL(imageFile);
+			await filesApi('/archivos/escritos', {
+				method: 'POST',
+				body: JSON.stringify({
+					title: name,
+					folder_id: Number(folderId),
+					image_path: dataUrl,
+					text_content: null,
+					html_content: null,
+					password: protectedFile ? password : null,
+				}),
+			});
 
-		closeUploadImageModal();
-		if (currentFolderId) {
-			openFolder(currentFolderId);
-		} else {
-			renderFolderGrid();
+			await loadFilesDataFromApi();
+			closeUploadImageModal();
+			if (currentFolderId) {
+				openFolder(currentFolderId);
+			} else {
+				renderFolderGrid();
+			}
+		} catch (error) {
+			alert(error.message || 'No se pudo guardar la imagen.');
 		}
 	}
 
@@ -1047,7 +1201,8 @@
 	filesWindow.addEventListener('mousedown', () => sendFilesMessage('focus'));
 	window.addEventListener('resize', clampFilesIntoViewport);
 
-	function bootstrapFilesApp() {
+	async function bootstrapFilesApp() {
+		await loadFilesDataFromApi();
 		renderFolderGrid();
 		openFilesFloating();
 

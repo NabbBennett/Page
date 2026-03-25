@@ -8,14 +8,35 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
 
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Concert+One&display=swap" rel="stylesheet">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
         <script src="https://cdn.tailwindcss.com"></script>
         
         <!-- Font Awesome -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
         <style>
+
+            .concert-one-regular {
+                font-family: "Concert One", sans-serif;
+                font-weight: 400;
+                font-style: normal;
+            }
+            
+            .roboto-condensed{
+                font-family: "Roboto Condensed", sans-serif;
+                font-optical-sizing: auto;
+                font-weight: <weight>;
+                font-style: normal;
+            }
+
             body {
-                font-family: 'Figtree', sans-serif;
+                font-family: 'Roboto Condensed', sans-serif;
                 height: 100dvh;
                 overflow: hidden;
             }
@@ -55,9 +76,8 @@
                 transform: scale(1.1);
             }
 
-            .sidebar-item svg {
-                width: 32px;
-                height: 32px;
+            .sidebar-item i {
+                font-size: 1.5rem;
             }
 
             .sidebar-item span {
@@ -126,12 +146,12 @@
                 font-size: 0.72rem;
                 letter-spacing: 0.04em;
                 text-transform: uppercase;
-                color: rgba(255, 255, 255, 0.72);
+                color: #443C3D;
                 padding: 0.45rem 1rem 0.35rem;
             }
 
             .mobile-start-empty {
-                color: rgba(255, 255, 255, 0.65);
+                color: #443C3D;
                 font-size: 0.86rem;
                 padding: 0.55rem 1rem 0.8rem;
             }
@@ -159,6 +179,7 @@
             .user-badge {
                 background-color: rgba(181, 155, 121, 0.4);
                 border: 1px solid rgba(181, 155, 121, 0.8);
+                font-family: 'Concert One', sans-serif;
                 padding: 0.5rem 1rem;
                 border-radius: 2rem;
                 font-size: 0.85rem;
@@ -181,8 +202,8 @@
                 right: 2rem;
                 background-color: rgba(255, 255, 255, 0.1);
                 border-radius: 50%;
-                width: 50px;
-                height: 50px;
+                width: 60px;
+                height: 60px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -194,9 +215,8 @@
                 background-color: rgba(255, 255, 255, 0.2);
             }
 
-            .chat-icon svg {
-                width: 28px;
-                height: 28px;
+            .chat-icon i {
+                font-size: 1.25rem;
                 color: white;
             }
 
@@ -240,12 +260,26 @@
                 border-bottom-color: #B59B79;
             }
 
-            body.dark-mode .menu-item {
+            body.dark-mode .menu-item{
                 color: #E2D8CC;
                 border-bottom-color: #B59B79;
             }
 
-            body.dark-mode .menu-item:hover {
+            body.dark-mode .mobile-start-title {
+                color: #E2D8CC;
+                border-bottom-color: #B59B79;
+            }
+
+            body.dark-mode .mobile-start-empty {
+                color: #E2D8CC;
+                border-bottom-color: #B59B79;
+            }
+
+            body.dark-mode .menu-item:hover{
+                background-color: #443C3D;
+                color: #E2D8CC;
+            }
+            body.dark-mode .mobile-start-title:hover {
                 background-color: #443C3D;
                 color: #E2D8CC;
             }
@@ -299,6 +333,8 @@
             body.dark-mode #filesModal .folder-card,
             body.dark-mode #filesModal .file-row,
             body.dark-mode #editorModal .save-modal,
+            body.dark-mode #editorModal .drafts-modal,
+            body.dark-mode #editorModal .draft-item,
             body.dark-mode #socialModal .modal-box,
             body.dark-mode #libraryModal .modal-box,
             body.dark-mode #filesModal .modal-box {
@@ -323,7 +359,8 @@
             body.dark-mode #editorModal .new-btn,
             body.dark-mode #editorModal .save-btn,
             body.dark-mode #editorModal .save-cancel-btn,
-            body.dark-mode #editorModal .save-confirm-btn {
+            body.dark-mode #editorModal .save-confirm-btn,
+            body.dark-mode #editorModal .draft-action-btn {
                 background: #272022 !important;
                 color: #E2D8CC !important;
                 border-color: #B59B79 !important;
@@ -332,6 +369,7 @@
             body.dark-mode #socialModal .post-action-btn,
             body.dark-mode #editorModal .toolbar-btn,
             body.dark-mode #editorModal .save-segmented-btn,
+            body.dark-mode #editorModal .save-close-btn,
             body.dark-mode #filesModal .icon-btn,
             body.dark-mode #filesModal .badge {
                 background: #272022 !important;
@@ -419,7 +457,7 @@
                 border-radius: 0.5rem;
             }
 
-            .menu-item svg {
+            .menu-item i {
                 width: 20px;
                 height: 20px;
             }
@@ -447,23 +485,6 @@
                 color: rgba(255, 255, 255, 0.6);
             }
 
-            .rest-moon {
-                width: 120px;
-                height: 120px;
-                margin: 0 auto 2rem;
-                border: 3px solid rgba(255, 255, 255, 0.3);
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-
-            .rest-moon svg {
-                width: 60px;
-                height: 60px;
-                color: rgba(255, 255, 255, 0.4);
-            }
-
             .floating-app {
                 position: fixed;
                 display: none;
@@ -480,15 +501,15 @@
                 position: fixed;
                 right: 1.4rem;
                 bottom: 5rem;
-                width: 340px;
-                background: rgba(9, 11, 15, 0.95);
-                border: 1px solid rgba(255, 255, 255, 0.16);
+                width: min(460px, calc(100vw - 2rem));
+                border-top: 1px solid rgba(255, 255, 255, 0.12);
+                background: linear-gradient(180deg, #4a2f24 0%, #3a231b 100%);
                 border-radius: 0.85rem;
                 color: #f8f9fb;
                 display: none;
                 align-items: center;
-                gap: 0.8rem;
-                padding: 0.55rem 0.75rem;
+                gap: 0.75rem;
+                padding: 0.55rem 0.8rem;
                 z-index: 1300;
                 box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
             }
@@ -500,14 +521,91 @@
             .music-mini-cover {
                 width: 44px;
                 height: 44px;
-                border-radius: 0.45rem;
-                background: linear-gradient(135deg, #c8abc7, #6f81cf);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: #1a1c28;
-                font-size: 1.2rem;
+                border-radius: 0.35rem;
+                object-fit: cover;
+                border: 1px solid rgba(255, 255, 255, 0.18);
+                background: #6b4a3e;
                 flex-shrink: 0;
+            }
+
+            .music-mini-meta {
+                min-width: 0;
+                flex: 1;
+            }
+
+            .music-mini-title {
+                color: #fff;
+                font-size: 0.76rem;
+                font-weight: 700;
+                line-height: 1.2;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .music-mini-author {
+                color: #d8c3b5;
+                font-size: 0.64rem;
+                margin-top: 0.08rem;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .music-mini-controls {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 0.35rem;
+            }
+
+            .music-mini-btn {
+                width: 26px;
+                height: 26px;
+                border-radius: 50%;
+                border: 1px solid rgba(255, 255, 255, 0.22);
+                background: radial-gradient(circle at 30% 30%, #8a5e4a 0%, #664535 68%, #4f3428 100%);
+                color: #fff;
+                cursor: pointer;
+                transition: transform 0.14s ease, box-shadow 0.14s ease;
+                box-shadow: 0 4px 9px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+            }
+
+            .music-mini-btn.primary {
+                width: 34px;
+                height: 34px;
+                background: radial-gradient(circle at 30% 30%, #b07a60 0%, #8a5f49 72%, #6f4938 100%);
+                border-color: rgba(255, 255, 255, 0.28);
+            }
+
+            .music-mini-btn.close {
+                width: 28px;
+                height: 28px;
+                border-radius: 0.45rem;
+                background: rgba(255, 255, 255, 0.12);
+            }
+
+            .music-mini-btn:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            }
+
+            body.dark-mode .music-mini {
+                background: linear-gradient(180deg, #251813 0%, #17100d 100%);
+                border-top-color: rgba(255, 255, 255, 0.1);
+            }
+
+            body.dark-mode .music-mini-author {
+                color: #f0dfd4;
+            }
+
+            body.dark-mode .music-mini-btn {
+                background: radial-gradient(circle at 30% 30%, #5a3d31 0%, #3f2a21 68%, #2e1f18 100%);
+                border-color: rgba(255, 255, 255, 0.16);
+            }
+
+            body.dark-mode .music-mini-btn.primary {
+                background: radial-gradient(circle at 30% 30%, #7f5a47 0%, #5d3f31 72%, #462e24 100%);
             }
 
             @media (max-width: 768px) {
@@ -540,9 +638,7 @@
     <body class="dashboard-bg h-screen flex flex-col">
         <!-- Chat Icon (Top Right) -->
         <div class="chat-icon">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
+            <i class="fas fa-comments"></i>
         </div>
 
         <!-- Main Content -->
@@ -552,34 +648,26 @@
                 <!-- Editor de Texto - Solo para Admin -->
                 @if($userType === 'admin')
                 <div class="sidebar-item" onclick="openTextEditor()">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
+                    <i class="fas fa-file"></i>
                     <span>Editor de<br/>Texto</span>
                 </div>
                 @endif
 
                 <!-- Red Social -->
                 <div class="sidebar-item" onclick="openSocialWindow()">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 10a3 3 0 11-6 0 3 3 0 016 0zM9 20H4v-2a6 6 0 0112 0v2H9z" />
-                    </svg>
+                    <i class="fas fa-user-group"></i>
                     <span>Red<br/>Social</span>
                 </div>
 
                 <!-- Biblioteca -->
                 <div class="sidebar-item" onclick="openBibliotecaWindow()">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C6.5 6.253 2 10.998 2 17.25c0 5.17 3.438 9.6 8.03 10.63m0-13c5.5 0 10 4.745 10 10.25 0 5.17-3.438 9.6-8.03 10.63M12 6.253L9.612 15.29c-.133.466-.228.965-.228 1.46 0 4.413 3.134 8.25 7.022 8.25s7.022-3.837 7.022-8.25c0-.495-.095-.994-.228-1.46L12 6.253z" />
-                    </svg>
+                    <i class="fas fa-book"></i>
                     <span>Biblioteca</span>
                 </div>
 
                 <!-- Archivos -->
                 <div class="sidebar-item" onclick="openFilesWindow()">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                    </svg>
+                    <i class="fas fa-folder"></i>
                     <span>Archivos</span>
                 </div>
             </div>
@@ -589,12 +677,12 @@
 
             <!-- Right Sidebar -->
             <div class="w-24 pt-8 pb-32 px-4 flex flex-col gap-12 items-center">
-                <div class="sidebar-item mt-auto" onclick="openMusicWindow()">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-2v13M9 19a2 2 0 11-4 0 2 2 0 014 0zm12-2a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
+                @if($userType === 'admin')
+                <div class="sidebar-item fixed right-4 bottom-24 z-50" onclick="openMusicWindow()">
+                    <i class="fas fa-music"></i>
                     <span>Música</span>
                 </div>
+                @endif
             </div>
         </div>
 
@@ -602,9 +690,7 @@
         <div class="bottom-bar">
             <div class="taskbar-left">
                 <div class="flex items-center gap-2 cursor-pointer" id="menuBtn" onclick="toggleMenu()">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM15.657 14.243a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM11 17v-1a1 1 0 10-2 0v1a1 1 0 102 0zM5.757 15.657a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM5.757 5.757a1 1 0 000-1.414L5.05 3.636a1 1 0 10-1.414 1.414l.707.707z" />
-                    </svg>
+                    <i class="fas fa-bars"></i>
                     <span>Inicio</span>
                 </div>
                 <div class="taskbar-separator"></div>
@@ -624,25 +710,23 @@
                     <i class="fas fa-folder"></i>
                     <span>Archivos</span>
                 </div>
+                @if($userType === 'admin')
                 <div id="musicBottomTab" class="taskbar-tab music" onclick="restoreMusicFromTaskbar()">
                     <i class="fas fa-music"></i>
                     <span>Música</span>
                 </div>
+                @endif
             </div>
 
             <!-- Menu Popup -->
             <div class="menu-popup" id="menuPopup">
                 <div class="menu-header">Menú de Inicio</div>
                 <div class="menu-item" onclick="toggleRest()">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 108.646 3.646 9.003 9.003 0 0020.354 15.354z" />
-                    </svg>
+                    <i class="fas fa-moon"></i>
                     <span>Descanso</span>
                 </div>
                 <div class="menu-item" onclick="logout()">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
+                    <i class="fas fa-sign-out-alt"></i>
                     <span>Cerrar Sesión</span>
                 </div>
                 <div id="mobileStartApps" class="mobile-start-apps"></div>
@@ -665,11 +749,7 @@
         <!-- Rest Overlay -->
         <div class="rest-overlay" id="restOverlay" onclick="toggleRest()">
             <div class="rest-content">
-                <div class="rest-moon">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 108.646 3.646 9.003 9.003 0 0020.354 15.354z" />
-                    </svg>
-                </div>
+                <img src="/storage/photo/NABBLOGO_BLANCO.png" alt="You need to wake up..." class="w-30 h-32 opacity-20 mx-auto mb-4">
                 <p>Haz clic en cualquier parte para despertar</p>
             </div>
         </div>
@@ -691,26 +771,29 @@
             @include('partials.archivos', ['userType' => $userType])
         </div>
 
-        <div id="musicModal" class="floating-app" style="z-index: 998;">
-            @include('partials.music', ['userType' => $userType])
-        </div>
+        @if($userType === 'admin')
+            <div id="musicModal" class="floating-app" style="z-index: 998;">
+                @include('partials.music', ['userType' => $userType])
+            </div>
 
-        <div id="musicMiniPlayer" class="music-mini" onclick="restoreMusicFromMini(event)">
-            <div class="music-mini-cover"><i class="fas fa-music"></i></div>
-            <div class="min-w-0 flex-1">
-                <div class="font-semibold truncate">Soft Spot</div>
-                <div class="text-xs text-gray-400 truncate">Piri & Tommy Villiers</div>
+            <div id="musicMiniPlayer" class="music-mini" onclick="restoreMusicFromMini(event)">
+                <img id="musicMiniCover" class="music-mini-cover" src="/storage/photo/NABBLOGO_BLANCO.png" alt="cover">
+                <div class="music-mini-meta">
+                    <div id="musicMiniTitle" class="music-mini-title">No hay canción seleccionada</div>
+                    <div id="musicMiniAuthor" class="music-mini-author">Selecciona una canción para reproducir.</div>
+                </div>
+                <div class="music-mini-controls">
+                    <button class="music-mini-btn" type="button" onclick="miniMusicControl('prev', event)" title="Anterior"><i class="fa-solid fa-backward-step"></i></button>
+                    <button id="musicMiniPlayBtn" class="music-mini-btn primary" type="button" onclick="miniMusicControl('playPause', event)" title="Reproducir / Pausar"><i class="fa-solid fa-play"></i></button>
+                    <button class="music-mini-btn" type="button" onclick="miniMusicControl('next', event)" title="Siguiente"><i class="fa-solid fa-forward-step"></i></button>
+                    <button class="music-mini-btn close" type="button" onclick="event.stopPropagation(); closeMusicWindow()" title="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+                </div>
             </div>
-            <div class="flex items-center gap-3 text-sm">
-                <button onclick="event.stopPropagation()">⏮</button>
-                <button onclick="event.stopPropagation()" class="w-8 h-8 rounded-full bg-gray-100 text-black">▶</button>
-                <button onclick="event.stopPropagation()">⏭</button>
-                <button onclick="event.stopPropagation(); closeMusicWindow()">×</button>
-            </div>
-        </div>
+        @endif
 
         <script>
             const DASHBOARD_THEME_KEY = 'dashboard_theme_v1';
+            const MUSIC_ENABLED = @json($userType === 'admin');
 
             function applyDashboardTheme(mode) {
                 const isDark = mode === 'dark';
@@ -741,25 +824,25 @@
                 const libraryBottomTab = document.getElementById('libraryBottomTab');
                 const filesBottomTab = document.getElementById('filesBottomTab');
                 const musicBottomTab = document.getElementById('musicBottomTab');
-                editorBottomTab.classList.remove('current');
-                socialBottomTab.classList.remove('current');
-                libraryBottomTab.classList.remove('current');
-                filesBottomTab.classList.remove('current');
-                musicBottomTab.classList.remove('current');
+                editorBottomTab?.classList.remove('current');
+                socialBottomTab?.classList.remove('current');
+                libraryBottomTab?.classList.remove('current');
+                filesBottomTab?.classList.remove('current');
+                musicBottomTab?.classList.remove('current');
 
-                if (app === 'editor' && editorBottomTab.classList.contains('active')) {
+                if (app === 'editor' && editorBottomTab?.classList.contains('active')) {
                     editorBottomTab.classList.add('current');
                 }
-                if (app === 'social' && socialBottomTab.classList.contains('active')) {
+                if (app === 'social' && socialBottomTab?.classList.contains('active')) {
                     socialBottomTab.classList.add('current');
                 }
-                if (app === 'library' && libraryBottomTab.classList.contains('active')) {
+                if (app === 'library' && libraryBottomTab?.classList.contains('active')) {
                     libraryBottomTab.classList.add('current');
                 }
-                if (app === 'files' && filesBottomTab.classList.contains('active')) {
+                if (app === 'files' && filesBottomTab?.classList.contains('active')) {
                     filesBottomTab.classList.add('current');
                 }
-                if (app === 'music' && musicBottomTab.classList.contains('active')) {
+                if (MUSIC_ENABLED && app === 'music' && musicBottomTab?.classList.contains('active')) {
                     musicBottomTab.classList.add('current');
                 }
             }
@@ -781,7 +864,7 @@
                 if (socialVisible) visible.push({ app: 'social', id: 'socialModal', z: Number(socialModal.style.zIndex || 0) });
                 if (libraryVisible) visible.push({ app: 'library', id: 'libraryModal', z: Number(libraryModal.style.zIndex || 0) });
                 if (filesVisible) visible.push({ app: 'files', id: 'filesModal', z: Number(filesModal.style.zIndex || 0) });
-                if (musicVisible) visible.push({ app: 'music', id: 'musicModal', z: Number(musicModal.style.zIndex || 0) });
+                if (MUSIC_ENABLED && musicVisible) visible.push({ app: 'music', id: 'musicModal', z: Number(musicModal.style.zIndex || 0) });
 
                 if (visible.length === 0) {
                     setCurrentTab('none');
@@ -823,8 +906,11 @@
                     { id: 'socialModal', app: 'social' },
                     { id: 'libraryModal', app: 'library' },
                     { id: 'filesModal', app: 'files' },
-                    { id: 'musicModal', app: 'music' },
                 ];
+
+                if (MUSIC_ENABLED) {
+                    mapping.push({ id: 'musicModal', app: 'music' });
+                }
 
                 mapping.forEach(({ id, app }) => {
                     const modal = document.getElementById(id);
@@ -886,7 +972,7 @@
                 if (document.getElementById('filesBottomTab')?.classList.contains('active')) {
                     entries.push({ icon: 'fa-folder', label: 'Archivos', action: 'restoreFilesFromTaskbar()' });
                 }
-                if (document.getElementById('musicBottomTab')?.classList.contains('active')) {
+                if (MUSIC_ENABLED && document.getElementById('musicBottomTab')?.classList.contains('active')) {
                     entries.push({ icon: 'fa-music', label: 'Música', action: 'restoreMusicFromTaskbar()' });
                 }
 
@@ -988,6 +1074,33 @@
                 }
             }
 
+            function updateMusicMiniPlayer(state = {}) {
+                if (!MUSIC_ENABLED) return;
+                const cover = document.getElementById('musicMiniCover');
+                const title = document.getElementById('musicMiniTitle');
+                const author = document.getElementById('musicMiniAuthor');
+                const playBtn = document.getElementById('musicMiniPlayBtn');
+
+                const hasTrack = !!state.track;
+                const coverUrl = state.track?.cover || '/storage/photo/NABBLOGO_BLANCO.png';
+
+                if (cover) cover.src = coverUrl;
+                if (title) title.textContent = hasTrack ? (state.track.title || 'Sin título') : 'No hay canción seleccionada';
+                if (author) author.textContent = hasTrack ? (state.track.artist || 'Autor desconocido') : 'Selecciona una canción para reproducir.';
+
+                if (playBtn) {
+                    playBtn.innerHTML = state.isPlaying
+                        ? '<i class="fa-solid fa-pause"></i>'
+                        : '<i class="fa-solid fa-play"></i>';
+                }
+            }
+
+            function miniMusicControl(action, event) {
+                if (!MUSIC_ENABLED) return;
+                if (event) event.stopPropagation();
+                window.postMessage({ app: 'music', type: 'miniControl', action }, '*');
+            }
+
             // Escuchar mensajes del editor (iframe)
             window.addEventListener('message', function(event) {
                 const modal = document.getElementById('editorModal');
@@ -1077,19 +1190,25 @@
                 }
 
                 if (event.data.app === 'music') {
-                    if (event.data.type === 'minimize') {
+                    if (!MUSIC_ENABLED || !musicModal || !musicBottomTab || !musicMiniPlayer) return;
+
+                    if (event.data.type === 'miniState') {
+                        updateMusicMiniPlayer(event.data || {});
+                    } else if (event.data.type === 'minimize') {
                         musicModal.style.display = 'none';
                         musicBottomTab.classList.add('active');
                         musicMiniPlayer.classList.add('visible');
-                        setCurrentTab('music');
+                        setFallbackCurrentTab();
                     } else if (event.data.type === 'maximize') {
                         setMaxLayout(musicModal);
                         bringToFront('musicModal');
+                        musicBottomTab.classList.add('active');
                         musicMiniPlayer.classList.remove('visible');
                         setCurrentTab('music');
                     } else if (event.data.type === 'restore') {
                         setWindowedLayout(musicModal);
                         bringToFront('musicModal');
+                        musicBottomTab.classList.add('active');
                         musicMiniPlayer.classList.remove('visible');
                         setCurrentTab('music');
                     } else if (event.data.type === 'close') {
@@ -1099,6 +1218,7 @@
                         setFallbackCurrentTab();
                     } else if (event.data.type === 'focus') {
                         bringToFront('musicModal');
+                        musicBottomTab.classList.add('active');
                         setCurrentTab('music');
                     }
                     return;
@@ -1186,9 +1306,12 @@
             }
 
             function openMusicWindow() {
+                if (!MUSIC_ENABLED) return;
                 const modal = document.getElementById('musicModal');
                 const musicBottomTab = document.getElementById('musicBottomTab');
                 const miniPlayer = document.getElementById('musicMiniPlayer');
+
+                if (!modal || !musicBottomTab || !miniPlayer) return;
 
                 setWindowedLayout(modal);
                 bringToFront('musicModal');
@@ -1202,18 +1325,23 @@
             }
 
             function restoreMusicFromTaskbar() {
+                if (!MUSIC_ENABLED) return;
                 openMusicWindow();
             }
 
             function restoreMusicFromMini(event) {
+                if (!MUSIC_ENABLED) return;
                 if (event) event.stopPropagation();
                 openMusicWindow();
             }
 
             function closeMusicWindow() {
+                if (!MUSIC_ENABLED) return;
                 const modal = document.getElementById('musicModal');
                 const miniPlayer = document.getElementById('musicMiniPlayer');
                 const musicBottomTab = document.getElementById('musicBottomTab');
+
+                if (!modal || !miniPlayer || !musicBottomTab) return;
 
                 modal.style.display = 'none';
                 miniPlayer.classList.remove('visible');

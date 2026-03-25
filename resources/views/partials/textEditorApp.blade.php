@@ -97,9 +97,19 @@
 
     #editorModal .toolbar-actions {
         margin-left: auto;
+        width: auto;
         display: flex;
         align-items: center;
+        justify-content: flex-end;
         gap: 0.75rem;
+    }
+
+    @media (max-width: 600px) {
+        #editorModal .toolbar-actions {
+            margin-left: 0;
+            width: 100%;
+            justify-content: center;
+        }
     }
 
     #editorModal .toolbar-btn {
@@ -397,6 +407,99 @@
         gap: 10px;
         margin-top: 10px;
     }
+
+    #editorModal .drafts-modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 2600;
+        pointer-events: auto;
+    }
+
+    #editorModal .drafts-modal-backdrop.active {
+        display: flex;
+    }
+
+    #editorModal .drafts-modal {
+        width: min(780px, calc(100% - 24px));
+        max-height: calc(100% - 24px);
+        overflow: auto;
+        background: #E2D8CC;
+        border: 2px solid #5a5250;
+        border-radius: 16px;
+        padding: 18px;
+        color: #443C3D;
+    }
+
+    #editorModal .drafts-list {
+        margin-top: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    #editorModal .draft-item {
+        border: 2px solid #b8b1aa;
+        border-radius: 14px;
+        background: #f2f2f2;
+        padding: 10px 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    #editorModal .draft-item.active {
+        border-color: #4d4548;
+    }
+
+    #editorModal .draft-title {
+        font-size: 1rem;
+        font-weight: 800;
+    }
+
+    #editorModal .draft-preview {
+        margin-top: 4px;
+        font-size: 0.92rem;
+        color: #5a5250;
+    }
+
+    #editorModal .draft-meta {
+        margin-top: 6px;
+        font-size: 0.8rem;
+        color: #7a726a;
+    }
+
+    #editorModal .draft-actions {
+        display: flex;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    #editorModal .draft-action-btn {
+        border: 1px solid #5a5250;
+        border-radius: 10px;
+        background: white;
+        color: #443C3D;
+        padding: 7px 10px;
+        font-size: 0.84rem;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    #editorModal .draft-action-btn:hover {
+        background: #443C3D;
+        color: #E2D8CC;
+    }
+
+    #editorModal .draft-action-btn.delete:hover {
+        background: #b3261e;
+        border-color: #b3261e;
+        color: #fff;
+    }
 </style>
 
 <div class="text-editor-window" id="editorWindow">
@@ -434,9 +537,9 @@
         </div>
 
         <div class="toolbar-actions">
-            <button class="new-btn" onclick="newNote()">
-                <i class="fas fa-plus"></i>
-                <span>Nueva</span>
+            <button class="new-btn" onclick="openDraftsModal()">
+                <i class="fas fa-file-alt"></i>
+                <span>Borradores</span>
             </button>
             <button class="save-btn" onclick="openSaveModal()">
                 <i class="fas fa-save"></i>
@@ -524,6 +627,24 @@
     </div>
 </div>
 
+<div class="drafts-modal-backdrop" id="draftsEditorModal">
+    <div class="drafts-modal">
+        <div class="save-modal-head">
+            <div class="save-modal-title">Borradores</div>
+            <button type="button" class="save-close-btn" onclick="closeDraftsModal()"><i class="fas fa-times"></i></button>
+        </div>
+
+        <div class="save-muted">Aquí se guardan los escritos que aún no has enviado a Libros o Archivos.</div>
+
+        <div class="save-actions" style="margin-top:12px;">
+            <button type="button" class="save-cancel-btn" onclick="startBlankDraft()"><i class="fas fa-plus"></i> Nuevo borrador</button>
+            <button type="button" class="save-confirm-btn enabled" onclick="closeDraftsModal()">Cerrar</button>
+        </div>
+
+        <div id="editorDraftsList" class="drafts-list"></div>
+    </div>
+</div>
+
 <script>
     let isEditorMaximized = false;
     let isEditorDragging = false;
@@ -535,9 +656,8 @@
     const EDITOR_MIN_WIDTH = 320;
     const EDITOR_MIN_HEIGHT = 240;
     const EDITOR_USER_ROLE = @json(session('user_type', 'guest'));
-    const FILES_STORAGE_KEY_EDITOR = `files_app_v1_${EDITOR_USER_ROLE}`;
-    const LIBRARY_STORAGE_KEY_EDITOR = `library_books_v1_${EDITOR_USER_ROLE}`;
-    const EDITOR_NOTE_FALLBACK_KEY = 'editorNote';
+    const EDITOR_CSRF = @json(csrf_token());
+    const NOTE_IMAGE_PREVIEW = 'https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=900&q=80';
 
     const editorWindow = document.getElementById('editorWindow');
     const editorHeader = document.getElementById('editorHeader');
@@ -547,29 +667,11 @@
     let currentBookMode = 'new';
     let selectedSaveFolderId = null;
     let selectedExistingBookId = null;
-
-    const defaultEditorFilesData = {
-        folders: [
-            { id: 'folder-1', name: 'Dribbble' },
-            { id: 'folder-2', name: 'Behance' },
-            { id: 'folder-3', name: 'Artstation' },
-        ],
-        files: [],
-    };
-
-    const defaultEditorLibraryBooks = [
-        {
-            id: 'book-1',
-            title: 'Tun',
-            author: 'Sebastian',
-            synopsis: 'Primer libro en la colección.',
-            status: 'En emisión',
-            totalChapters: 1,
-            currentChapter: 0,
-            cover: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=600&q=80',
-            chapters: [],
-        }
-    ];
+    let currentDraftId = null;
+    let editorDraftSaveTimeout = null;
+    let editorFilesCache = { folders: [], files: [] };
+    let editorBooksCache = [];
+    let editorDraftsCache = [];
 
     function escapeEditorHtml(text) {
         return (text || '')
@@ -580,30 +682,254 @@
             .replaceAll("'", '&#39;');
     }
 
-    function getEditorFilesData() {
-        const raw = localStorage.getItem(FILES_STORAGE_KEY_EDITOR);
-        if (!raw) {
-            localStorage.setItem(FILES_STORAGE_KEY_EDITOR, JSON.stringify(defaultEditorFilesData));
-            return JSON.parse(JSON.stringify(defaultEditorFilesData));
+    async function editorApi(url, options = {}) {
+        const headers = {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            ...options.headers,
+        };
+
+        if (options.body && !(options.body instanceof FormData)) {
+            headers['Content-Type'] = 'application/json';
+            headers['X-CSRF-TOKEN'] = EDITOR_CSRF;
         }
-        return JSON.parse(raw);
+
+        if ((options.method || 'GET').toUpperCase() !== 'GET' && !headers['X-CSRF-TOKEN']) {
+            headers['X-CSRF-TOKEN'] = EDITOR_CSRF;
+        }
+
+        const response = await fetch(url, {
+            credentials: 'same-origin',
+            ...options,
+            headers,
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+            throw new Error(data?.message || 'No se pudo completar la operación.');
+        }
+
+        return data;
+    }
+
+    async function loadEditorFilesData() {
+        const response = await editorApi('/archivos/carpetas');
+        editorFilesCache = {
+            folders: Array.isArray(response?.folders)
+                ? response.folders.map(folder => ({
+                    id: String(folder.id),
+                    name: folder.name || 'Sin nombre',
+                }))
+                : [],
+            files: [],
+        };
+    }
+
+    async function loadEditorLibraryBooks() {
+        const response = await editorApi('/biblioteca/libros');
+        const books = Array.isArray(response?.books) ? response.books : [];
+
+        editorBooksCache = books.map(book => ({
+            id: String(book.id),
+            title: book.title || '',
+            author: book.author || '',
+            synopsis: book.description || '',
+            status: book.status || 'En emisión',
+            cover: book.cover_path || '',
+            totalChapters: Array.isArray(book.chapters) ? book.chapters.length : 0,
+            currentChapter: 0,
+            chapters: Array.isArray(book.chapters)
+                ? book.chapters.map((chapter, index) => ({
+                    id: String(chapter.id),
+                    title: chapter.chapter_title || `Capítulo ${index + 1}`,
+                    content: chapter.html_content || chapter.text_content || '',
+                    chapterNumber: Number(chapter.chapter_number || index + 1),
+                }))
+                : [],
+        }));
+    }
+
+    function getEditorFilesData() {
+        return editorFilesCache;
     }
 
     function setEditorFilesData(data) {
-        localStorage.setItem(FILES_STORAGE_KEY_EDITOR, JSON.stringify(data));
+        editorFilesCache = data;
     }
 
     function getEditorLibraryBooks() {
-        const raw = localStorage.getItem(LIBRARY_STORAGE_KEY_EDITOR);
-        if (!raw) {
-            localStorage.setItem(LIBRARY_STORAGE_KEY_EDITOR, JSON.stringify(defaultEditorLibraryBooks));
-            return JSON.parse(JSON.stringify(defaultEditorLibraryBooks));
-        }
-        return JSON.parse(raw);
+        return editorBooksCache;
     }
 
     function setEditorLibraryBooks(items) {
-        localStorage.setItem(LIBRARY_STORAGE_KEY_EDITOR, JSON.stringify(items));
+        editorBooksCache = items;
+    }
+
+    function getEditorDrafts() {
+        return Array.isArray(editorDraftsCache) ? editorDraftsCache : [];
+    }
+
+    function setEditorDrafts(items) {
+        editorDraftsCache = Array.isArray(items) ? items : [];
+    }
+
+    function resetEditorHeaderTitle() {
+        const titleNode = document.querySelector('#editorModal .editor-header-title span');
+        if (titleNode) titleNode.textContent = 'Editor de Texto';
+    }
+
+    function formatDraftDate(isoString) {
+        if (!isoString) return 'Sin fecha';
+        const date = new Date(isoString);
+        if (Number.isNaN(date.getTime())) return 'Sin fecha';
+        return date.toLocaleString('es-MX', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+        });
+    }
+
+    function buildDraftTitleFromText(text) {
+        const safeText = (text || '').replace(/\s+/g, ' ').trim();
+        if (!safeText) return 'Borrador sin título';
+        return safeText.slice(0, 52);
+    }
+
+    function buildDraftPreviewFromText(text) {
+        const safeText = (text || '').replace(/\s+/g, ' ').trim();
+        if (!safeText) return 'Sin contenido';
+        return safeText.slice(0, 120);
+    }
+
+    function persistCurrentContentAsDraft() {
+        const html = getEditorContentHtml();
+        const text = getEditorContentText();
+
+        if (!html || !text) {
+            return null;
+        }
+
+        const drafts = getEditorDrafts();
+        const now = new Date().toISOString();
+        const draftTitle = buildDraftTitleFromText(text);
+
+        if (currentDraftId) {
+            const index = drafts.findIndex(item => item.id === currentDraftId);
+            if (index !== -1) {
+                drafts[index] = {
+                    ...drafts[index],
+                    title: draftTitle,
+                    preview: buildDraftPreviewFromText(text),
+                    htmlContent: html,
+                    textContent: text,
+                    updatedAt: now,
+                };
+                setEditorDrafts(drafts);
+                return currentDraftId;
+            }
+        }
+
+        const newDraftId = `draft-${Date.now()}`;
+        drafts.unshift({
+            id: newDraftId,
+            title: draftTitle,
+            preview: buildDraftPreviewFromText(text),
+            htmlContent: html,
+            textContent: text,
+            createdAt: now,
+            updatedAt: now,
+        });
+        setEditorDrafts(drafts);
+        currentDraftId = newDraftId;
+        return newDraftId;
+    }
+
+    function removeCurrentDraftIfExists() {
+        if (!currentDraftId) return;
+        const drafts = getEditorDrafts().filter(item => item.id !== currentDraftId);
+        setEditorDrafts(drafts);
+        currentDraftId = null;
+    }
+
+    function renderDraftsList() {
+        const wrap = document.getElementById('editorDraftsList');
+        if (!wrap) return;
+
+        const drafts = getEditorDrafts().sort((a, b) => {
+            return new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime();
+        });
+
+        if (drafts.length === 0) {
+            wrap.innerHTML = '<div class="save-muted">No hay borradores guardados todavía.</div>';
+            return;
+        }
+
+        wrap.innerHTML = drafts.map(draft => `
+            <div class="draft-item ${currentDraftId === draft.id ? 'active' : ''}">
+                <div style="min-width:0;">
+                    <div class="draft-title">${escapeEditorHtml(draft.title || 'Borrador sin título')}</div>
+                    <div class="draft-preview">${escapeEditorHtml(draft.preview || 'Sin contenido')}</div>
+                    <div class="draft-meta">Actualizado: ${escapeEditorHtml(formatDraftDate(draft.updatedAt || draft.createdAt))}</div>
+                </div>
+                <div class="draft-actions">
+                    <button type="button" class="draft-action-btn" onclick="loadDraftIntoEditor('${draft.id}')">Continuar</button>
+                    <button type="button" class="draft-action-btn delete" onclick="deleteDraftById('${draft.id}')"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function openDraftsModal() {
+        persistCurrentContentAsDraft();
+        renderDraftsList();
+        document.getElementById('draftsEditorModal')?.classList.add('active');
+    }
+
+    function closeDraftsModal() {
+        document.getElementById('draftsEditorModal')?.classList.remove('active');
+    }
+
+    function loadDraftIntoEditor(draftId) {
+        const drafts = getEditorDrafts();
+        const draft = drafts.find(item => item.id === draftId);
+        if (!draft) {
+            alert('No se encontró el borrador seleccionado.');
+            renderDraftsList();
+            return;
+        }
+
+        const editor = document.getElementById('editorRichContent');
+        if (!editor) return;
+
+        editor.innerHTML = draft.htmlContent || '';
+        editor.focus();
+        currentDraftId = draft.id;
+        closeDraftsModal();
+        resetEditorHeaderTitle();
+    }
+
+    function deleteDraftById(draftId) {
+        const drafts = getEditorDrafts().filter(item => item.id !== draftId);
+        setEditorDrafts(drafts);
+
+        if (currentDraftId === draftId) {
+            currentDraftId = null;
+        }
+
+        renderDraftsList();
+    }
+
+    function startBlankDraft() {
+        const editor = document.getElementById('editorRichContent');
+        if (editor) {
+            editor.innerHTML = '';
+            editor.focus();
+        }
+        currentDraftId = null;
+        resetEditorHeaderTitle();
+        closeDraftsModal();
     }
 
     function findChapterInBooks(bookId, chapterId) {
@@ -637,7 +963,7 @@
 
         editor.innerHTML = htmlToLoad;
         editor.focus();
-        localStorage.setItem(EDITOR_NOTE_FALLBACK_KEY, htmlToLoad);
+        currentDraftId = null;
 
         const titleNode = document.querySelector('#editorModal .editor-header-title span');
         if (titleNode && chapterTitle) {
@@ -725,10 +1051,20 @@
         if (!checked) input.value = '';
     }
 
-    function openSaveModal() {
+    async function openSaveModal() {
         const content = getEditorContentText();
         if (!content) {
             alert('La nota está vacía. Escribe algo antes de guardar.');
+            return;
+        }
+
+        try {
+            await Promise.all([
+                loadEditorFilesData(),
+                loadEditorLibraryBooks(),
+            ]);
+        } catch (error) {
+            alert(error.message || 'No se pudieron cargar carpetas/libros.');
             return;
         }
 
@@ -746,7 +1082,7 @@
         document.getElementById('saveEditorModal').classList.remove('active');
     }
 
-    function saveAsFileNote(content) {
+    async function saveAsFileNote(content) {
         const noteName = document.getElementById('saveNoteNameInput').value.trim();
         const encrypted = document.getElementById('saveEncryptCheck').checked;
         const password = document.getElementById('saveEncryptPassword').value;
@@ -766,23 +1102,21 @@
             return false;
         }
 
-        const filesData = getEditorFilesData();
-        filesData.files.push({
-            id: `file-${Date.now()}`,
-            folderId: selectedSaveFolderId,
-            name: noteName,
-            image: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=900&q=80',
-            password: encrypted ? password : null,
-            kind: 'note',
-            textContent: getEditorContentText(),
-            htmlContent: content,
+        await editorApi('/archivos/escritos', {
+            method: 'POST',
+            body: JSON.stringify({
+                title: noteName,
+                folder_id: Number(selectedSaveFolderId),
+                image_path: NOTE_IMAGE_PREVIEW,
+                text_content: getEditorContentText(),
+                html_content: content,
+                password: encrypted ? password : null,
+            }),
         });
-        setEditorFilesData(filesData);
-        localStorage.setItem(EDITOR_NOTE_FALLBACK_KEY, content);
         return true;
     }
 
-    function saveAsBookChapter(content) {
+    async function saveAsBookChapter(content) {
         const books = getEditorLibraryBooks();
 
         if (currentBookMode === 'new') {
@@ -795,24 +1129,34 @@
                 return false;
             }
 
-            books.push({
-                id: `book-${Date.now()}`,
-                title,
-                author,
-                synopsis: '',
-                status: 'En emisión',
-                totalChapters: 1,
-                currentChapter: 0,
-                cover: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=600&q=80',
-                chapters: [{
-                    id: `chapter-${Date.now()}`,
-                    title: firstChapterName,
-                    content,
-                    createdAt: new Date().toISOString(),
-                }],
+            const bookResponse = await editorApi('/biblioteca/libros', {
+                method: 'POST',
+                body: JSON.stringify({
+                    title,
+                    author,
+                    description: '',
+                    status: 'En emisión',
+                    cover_path: null,
+                }),
             });
 
-            setEditorLibraryBooks(books);
+            const bookId = String(bookResponse?.book?.id || '');
+            if (!bookId) {
+                alert('No se pudo crear el libro.');
+                return false;
+            }
+
+            await editorApi(`/biblioteca/libros/${bookId}/asignaciones`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    chapter_number: 1,
+                    chapter_title: firstChapterName,
+                    text_content: getEditorContentText(),
+                    html_content: content,
+                }),
+            });
+
+            await loadEditorLibraryBooks();
             return true;
         }
 
@@ -834,37 +1178,44 @@
         }
 
         const existingChapters = Array.isArray(books[index].chapters) ? books[index].chapters : [];
-        existingChapters.push({
-            id: `chapter-${Date.now()}`,
-            title: chapterName,
-            content,
-            createdAt: new Date().toISOString(),
+        const nextChapterNumber = existingChapters.length + 1;
+
+        await editorApi(`/biblioteca/libros/${selectedExistingBookId}/asignaciones`, {
+            method: 'POST',
+            body: JSON.stringify({
+                chapter_number: nextChapterNumber,
+                chapter_title: chapterName,
+                text_content: getEditorContentText(),
+                html_content: content,
+            }),
         });
 
-        books[index] = {
-            ...books[index],
-            chapters: existingChapters,
-            totalChapters: Math.max(1, Number(books[index].totalChapters || 0) + 1),
-        };
-
-        setEditorLibraryBooks(books);
+        await loadEditorLibraryBooks();
         return true;
     }
 
-    function saveFromEditorModal() {
+    async function saveFromEditorModal() {
         const content = getEditorContentHtml();
         if (!content) {
             alert('La nota está vacía.');
             return;
         }
 
-        const ok = currentSaveTarget === 'note'
-            ? saveAsFileNote(content)
-            : saveAsBookChapter(content);
+        let ok = false;
+        try {
+            ok = currentSaveTarget === 'note'
+                ? await saveAsFileNote(content)
+                : await saveAsBookChapter(content);
+        } catch (error) {
+            alert(error.message || 'No se pudo guardar.');
+            return;
+        }
 
         if (!ok) return;
 
         closeSaveModal();
+        removeCurrentDraftIfExists();
+        startBlankDraft();
         alert(currentSaveTarget === 'note'
             ? 'Nota guardada en Archivos correctamente.'
             : 'Capítulo guardado en Biblioteca correctamente.');
@@ -1023,13 +1374,8 @@
         return (document.getElementById('editorRichContent')?.innerText || '').trim();
     }
 
-    function showNotes() {
-        alert('Notas: Funcionalidad en desarrollo');
-    }
-
     function newNote() {
-        const editor = document.getElementById('editorRichContent');
-        if (editor) editor.innerHTML = '';
+        startBlankDraft();
     }
 
     function saveNote() {
@@ -1063,9 +1409,14 @@
             return;
         }
 
-        const savedNote = localStorage.getItem(EDITOR_NOTE_FALLBACK_KEY);
-        if (savedNote) {
-            document.getElementById('editorRichContent').innerHTML = savedNote;
+        const editor = document.getElementById('editorRichContent');
+        if (editor) {
+            editor.addEventListener('input', () => {
+                if (editorDraftSaveTimeout) clearTimeout(editorDraftSaveTimeout);
+                editorDraftSaveTimeout = setTimeout(() => {
+                    persistCurrentContentAsDraft();
+                }, 700);
+            });
         }
     });
 

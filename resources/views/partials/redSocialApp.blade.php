@@ -724,6 +724,7 @@
         #socialModal .left-menu { width: 74px; padding: 8px; }
         #socialModal .left-menu .menu-item span { display: none; }
         #socialModal .composer input { font-size: 0.95rem; }
+        #socialModal .content { padding: 10px; }
         #socialModal .post-body,
         #socialModal .post-actions,
         #socialModal .tabs,
@@ -736,6 +737,144 @@
         #socialModal .profile-bio,
         #socialModal .profile-user,
         #socialModal .small { font-size: 0.85rem; }
+
+        #socialModal .post-actions {
+            justify-content: flex-start;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        #socialModal .post-action-btn {
+            font-size: 0.9rem;
+            padding: 7px 9px;
+        }
+
+        #socialModal .profile-row {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+        }
+
+        #socialModal .profile-row .primary-btn {
+            width: 100%;
+        }
+
+        #socialModal .profile-top {
+            align-items: flex-start;
+        }
+
+        #socialModal .profile-meta {
+            flex-wrap: wrap;
+            gap: 12px !important;
+        }
+
+        #socialModal .gallery {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 768px) {
+        #socialModal .left-menu {
+            width: 62px;
+            padding: 6px;
+        }
+
+        #socialModal .menu-item {
+            justify-content: center;
+            padding: 10px 6px;
+        }
+
+        #socialModal .composer {
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        #socialModal .composer input,
+        #socialModal .composer .primary-btn {
+            width: 100%;
+        }
+
+        #socialModal .post-image,
+        #socialModal #sectionInicio .post-image {
+            height: 220px;
+            max-height: 220px;
+        }
+
+        #socialModal .comment-media {
+            height: 160px;
+            max-height: 160px;
+        }
+
+        #socialModal .tabs {
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        #socialModal .profile-cover {
+            height: 130px;
+        }
+
+        #socialModal .profile-top {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        #socialModal .profile-top .avatar {
+            width: 88px !important;
+            height: 88px !important;
+        }
+
+        #socialModal .modal-box {
+            width: calc(100% - 12px);
+            max-height: calc(100% - 12px);
+            padding: 12px;
+        }
+
+        #socialModal .row-2,
+        #socialModal .modal-actions,
+        #socialModal .modal-actions-3 {
+            grid-template-columns: 1fr;
+        }
+
+        #socialModal .upload-zone {
+            min-height: 110px;
+        }
+    }
+
+    @media (max-width: 560px) {
+        #socialModal .gallery {
+            grid-template-columns: 1fr;
+        }
+
+        #socialModal .post-head {
+            align-items: flex-start;
+        }
+
+        #socialModal .post-actions {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 6px;
+            justify-content: stretch;
+        }
+
+        #socialModal .post-action-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 420px) {
+        #socialModal .post-action-btn {
+            padding: 8px 0;
+            gap: 0;
+            font-size: 0;
+            min-height: 38px;
+        }
+
+        #socialModal .post-action-btn i {
+            font-size: 1rem;
+            line-height: 1;
+        }
     }
 </style>
 
@@ -949,9 +1088,6 @@
 <script>
     const USER_TYPE = @json($userType ?? 'guest');
     const CSRF_TOKEN = @json(csrf_token());
-    const STORAGE_CHARACTERS = 'social_characters_v1';
-    const STORAGE_POSTS = 'social_posts_v1';
-    const STORAGE_POST_LIKES = `social_liked_posts_v1_${USER_TYPE}`;
     const MIN_WIDTH = 320;
     const MIN_HEIGHT = 240;
 
@@ -960,63 +1096,9 @@
     let editingProfileId = null;
     let selectedPostId = null;
     let isMaximized = false;
-
-    const defaultCharacters = [
-        { id: 'char-1', name: 'Elena Reyes', username: '@elenareyes', bio: 'Diseñadora digital | Amante del arte vintage | Café ☕', avatar: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Elena&backgroundColor=b59b79', banner: 'https://images.unsplash.com/photo-1508264165352-258a6f82b407?auto=format&fit=crop&w=1200&q=80', followers: 1234, following: 567, joined: 'Enero 2015' },
-        { id: 'char-2', name: 'Carlos Mendoza', username: '@carlosmdev', bio: 'Desarrollador Full Stack | Tech enthusiast | Always learning...', avatar: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Carlos&backgroundColor=b59b79', banner: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1200&q=80', followers: 980, following: 410, joined: 'Marzo 2018' },
-        { id: 'char-3', name: 'Sofía Luna', username: '@sofialuna', bio: 'Exploradora digital | Fotógrafa | Viajera 🌍 📷', avatar: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Sofia&backgroundColor=b59b79', banner: 'https://images.unsplash.com/photo-1439066615861-d1af74d74000?auto=format&fit=crop&w=1200&q=80', followers: 802, following: 356, joined: 'Julio 2020' }
-    ];
-
-    const defaultPosts = [
-        {
-            id: 'post-1',
-            characterId: 'char-1',
-            text: '¡Acabo de terminar mi primer proyecto! Muy emocionada de compartirlo con todos. 🎉',
-            image: '',
-            createdAt: Date.now() - (2 * 60 * 60 * 1000),
-            likes: 24,
-            commentsList: [
-                { id: 'comment-1', characterId: 'char-2', text: '¡Felicidades!', createdAt: Date.now() - (30 * 60 * 1000) },
-                { id: 'comment-2', characterId: 'char-3', text: 'Increíble trabajo', createdAt: Date.now() - (60 * 60 * 1000) },
-            ],
-        },
-        {
-            id: 'post-2',
-            characterId: 'char-2',
-            text: 'Trabajando en algo increíble. No puedo esperar para mostrárselo al mundo. #desarrollo #tech',
-            image: '',
-            createdAt: Date.now() - (4 * 60 * 60 * 1000),
-            likes: 42,
-            commentsList: [
-                { id: 'comment-3', characterId: 'char-1', text: '¡Se viene algo grande!', createdAt: Date.now() - (90 * 60 * 1000) },
-            ],
-        },
-        {
-            id: 'post-3',
-            characterId: 'char-1',
-            text: 'Trabajando en un nuevo proyecto de diseño vintage. ¡Me encanta este estilo retro! 😍✨',
-            image: 'https://images.unsplash.com/photo-1487611459768-bd414656ea10?auto=format&fit=crop&w=1000&q=80',
-            createdAt: Date.now() - (3 * 60 * 60 * 1000),
-            likes: 89,
-            commentsList: [
-                { id: 'comment-4', characterId: 'char-3', text: 'Ese estilo está brutal 🔥', createdAt: Date.now() - (70 * 60 * 1000) },
-                { id: 'comment-5', characterId: 'char-2', text: 'Muy buen diseño', createdAt: Date.now() - (50 * 60 * 1000) },
-            ],
-        },
-        {
-            id: 'post-4',
-            characterId: 'char-1',
-            text: '',
-            image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1000&q=80',
-            createdAt: Date.now() - (8 * 60 * 60 * 1000),
-            likes: 54,
-            commentsList: [
-                { id: 'comment-6', characterId: 'char-2', text: 'Qué foto tan buena 👏', createdAt: Date.now() - (7 * 60 * 60 * 1000) },
-                { id: 'comment-7', characterId: 'char-3', text: 'Hermosa vista', createdAt: Date.now() - (6 * 60 * 60 * 1000) },
-                { id: 'comment-8', characterId: 'char-1', text: 'Gracias por comentar 💛', createdAt: Date.now() - (5 * 60 * 60 * 1000) },
-            ],
-        }
-    ];
+    let socialCharacters = [];
+    let socialPosts = [];
+    let likedPostIds = [];
 
     function sendSocialMessage(type, extra = {}) {
         const payload = { app: 'social', type, ...extra };
@@ -1045,16 +1127,9 @@
         image.removeAttribute('src');
     }
 
-    function getCharacters() {
-        const raw = localStorage.getItem(STORAGE_CHARACTERS);
-        if (!raw) {
-            localStorage.setItem(STORAGE_CHARACTERS, JSON.stringify(defaultCharacters));
-            return [...defaultCharacters];
-        }
-        return JSON.parse(raw);
-    }
+    function getCharacters() { return socialCharacters; }
 
-    function setCharacters(items) { localStorage.setItem(STORAGE_CHARACTERS, JSON.stringify(items)); }
+    function setCharacters(items) { socialCharacters = Array.isArray(items) ? [...items] : []; }
 
     function normalizePost(post) {
         const commentsList = Array.isArray(post?.commentsList) ? post.commentsList : [];
@@ -1066,29 +1141,14 @@
         };
     }
 
-    function getPosts() {
-        const raw = localStorage.getItem(STORAGE_POSTS);
-        if (!raw) {
-            const normalizedDefaults = defaultPosts.map(normalizePost);
-            localStorage.setItem(STORAGE_POSTS, JSON.stringify(normalizedDefaults));
-            return [...normalizedDefaults];
-        }
-        const parsed = JSON.parse(raw).map(normalizePost);
-        localStorage.setItem(STORAGE_POSTS, JSON.stringify(parsed));
-        return parsed;
-    }
+    function getPosts() { return socialPosts; }
 
-    function setPosts(items) { localStorage.setItem(STORAGE_POSTS, JSON.stringify(items.map(normalizePost))); }
+    function setPosts(items) { socialPosts = Array.isArray(items) ? items.map(normalizePost) : []; }
 
-    function getLikedPostIds() {
-        const raw = localStorage.getItem(STORAGE_POST_LIKES);
-        if (!raw) return [];
-        const parsed = JSON.parse(raw);
-        return Array.isArray(parsed) ? parsed : [];
-    }
+    function getLikedPostIds() { return likedPostIds; }
 
     function setLikedPostIds(items) {
-        localStorage.setItem(STORAGE_POST_LIKES, JSON.stringify(items));
+        likedPostIds = Array.isArray(items) ? [...items] : [];
     }
 
     function hasLikedPost(postId) {
@@ -1338,11 +1398,10 @@
             }
         }
 
-        const posts = currentPosts.filter(item => item.id !== postId);
-        setPosts(posts);
+        await loadSocialDataFromDatabase();
 
-        const likedPostIds = getLikedPostIds().filter(id => id !== postId);
-        setLikedPostIds(likedPostIds);
+        const updatedLikedPostIds = getLikedPostIds().filter(id => id !== postId);
+        setLikedPostIds(updatedLikedPostIds);
 
         if (selectedPostId === postId) {
             selectedPostId = null;
@@ -1529,9 +1588,8 @@
             }
         }
 
-        let dbCommentId = null;
         try {
-            const commentResult = await saveCommentInDatabase(posts[index].dbId, {
+            await saveCommentInDatabase(posts[index].dbId, {
                 comment: text,
                 image,
                 character: {
@@ -1543,29 +1601,12 @@
                     banner: commentCharacter.banner,
                 },
             });
-            dbCommentId = commentResult?.comment?.id ?? null;
         } catch (error) {
             alert(error.message || 'No se pudo guardar el comentario en la base de datos.');
             return;
         }
 
-        const commentsList = Array.isArray(posts[index].commentsList) ? [...posts[index].commentsList] : [];
-        commentsList.push({
-            id: dbCommentId ? `comment-db-${dbCommentId}` : `comment-${Date.now()}`,
-            dbId: dbCommentId,
-            characterId,
-            text,
-            image,
-            createdAt: Date.now(),
-        });
-
-        posts[index] = {
-            ...posts[index],
-            commentsList,
-            comments: commentsList.length,
-        };
-
-        setPosts(posts);
+        await loadSocialDataFromDatabase();
         renderCommentsModal();
         rerenderPostContexts();
     }
@@ -1804,6 +1845,58 @@
         }
     }
 
+    async function loadSocialDataFromDatabase() {
+        const response = await fetch('/social/data', {
+            headers: {
+                'Accept': 'application/json',
+            },
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+            throw new Error(data?.message || 'No se pudo cargar la red social desde la base de datos.');
+        }
+
+        const profiles = Array.isArray(data?.profiles) ? data.profiles : [];
+        const posts = Array.isArray(data?.posts) ? data.posts : [];
+
+        setCharacters(profiles.map((profile) => ({
+            id: String(profile?.id ?? `char-db-${profile?.db_id ?? Date.now()}`),
+            dbId: Number(profile?.db_id ?? 0) || null,
+            name: String(profile?.name ?? ''),
+            username: String(profile?.username ?? ''),
+            bio: String(profile?.bio ?? ''),
+            avatar: String(profile?.avatar ?? ''),
+            banner: String(profile?.banner ?? ''),
+            followers: Number(profile?.followers ?? 0),
+            following: Number(profile?.following ?? 0),
+            joined: String(profile?.joined ?? '-'),
+        })));
+
+        setPosts(posts.map((post) => {
+            const comments = Array.isArray(post?.comments_list) ? post.comments_list : [];
+            return {
+                id: String(post?.id ?? `post-db-${post?.db_id ?? Date.now()}`),
+                dbId: Number(post?.db_id ?? 0) || null,
+                characterId: String(post?.character_id ?? ''),
+                text: String(post?.text ?? ''),
+                image: String(post?.image ?? ''),
+                createdAt: Number(post?.created_at ?? Date.now()),
+                likes: Number(post?.likes ?? 0),
+                commentsList: comments.map((comment) => ({
+                    id: String(comment?.id ?? `comment-db-${comment?.db_id ?? Date.now()}`),
+                    dbId: Number(comment?.db_id ?? 0) || null,
+                    characterId: String(comment?.character_id ?? ''),
+                    text: String(comment?.text ?? ''),
+                    image: String(comment?.image ?? ''),
+                    createdAt: Number(comment?.created_at ?? Date.now()),
+                })),
+            };
+        }));
+
+        setLikedPostIds(getLikedPostIds().filter((postId) => findPost(postId)));
+    }
+
     async function deleteComment(commentId) {
         if (USER_TYPE !== 'admin') return;
         if (!selectedPostId) return;
@@ -1860,9 +1953,8 @@
         let image = '';
         if (imageFile) image = await fileToDataURL(imageFile);
 
-        let dbPostId = null;
         try {
-            const dbResult = await savePostInDatabase({
+            await savePostInDatabase({
                 text,
                 image,
                 character: {
@@ -1874,15 +1966,12 @@
                     banner: character.banner,
                 },
             });
-            dbPostId = dbResult?.post?.id ?? null;
         } catch (error) {
             alert(error.message || 'No se pudo guardar el post en la base de datos.');
             return;
         }
 
-        const posts = getPosts();
-        posts.push({ id: `post-${Date.now()}`, dbId: dbPostId, characterId, text, image, createdAt: Date.now(), likes: 0, comments: 0, commentsList: [] });
-        setPosts(posts);
+        await loadSocialDataFromDatabase();
         closePostModal();
         renderFeed();
         if (selectedProfileId === characterId && currentView === 'perfilDetalle') openProfileDetail(characterId);
@@ -1903,35 +1992,20 @@
         }
 
         const [avatar, banner] = await Promise.all([fileToDataURL(avatarFile), fileToDataURL(bannerFile)]);
-        let createdDbProfile = null;
         try {
-            const dbResult = await createProfileInDatabase({
+            await createProfileInDatabase({
                 name,
                 username,
                 bio,
                 avatar,
                 banner,
             });
-            createdDbProfile = dbResult?.profile ?? null;
         } catch (error) {
             alert(error.message || 'No se pudo crear el perfil en la base de datos.');
             return;
         }
 
-        const chars = getCharacters();
-        chars.push({
-            id: `char-${Date.now()}`,
-            dbId: createdDbProfile?.id ?? null,
-            name: createdDbProfile?.name ?? name,
-            username: createdDbProfile?.username ?? (username.startsWith('@') ? username : `@${username}`),
-            bio: createdDbProfile?.bio ?? bio,
-            avatar: createdDbProfile?.avatar ?? avatar,
-            banner: createdDbProfile?.banner ?? banner,
-            followers: 0,
-            following: 0,
-            joined: new Date().toLocaleString('es-ES', { month: 'long', year: 'numeric' })
-        });
-        setCharacters(chars);
+        await loadSocialDataFromDatabase();
 
         closeProfileModal();
         renderProfiles();
@@ -1955,6 +2029,13 @@
         const chars = getCharacters();
         const index = chars.findIndex(item => item.id === editingProfileId);
         if (index === -1) return;
+        const profileIdToOpen = editingProfileId;
+        const dbProfileId = chars[index].dbId;
+
+        if (!dbProfileId) {
+            alert('No se encontró el perfil en la base de datos.');
+            return;
+        }
 
         let avatar = chars[index].avatar;
         let banner = chars[index].banner;
@@ -1964,36 +2045,25 @@
 
         const normalizedUsername = username.startsWith('@') ? username : `@${username}`;
 
-        if (chars[index].dbId) {
-            try {
-                await updateProfileInDatabase(chars[index].dbId, {
-                    name,
-                    username: normalizedUsername,
-                    bio,
-                    avatar,
-                    banner,
-                });
-            } catch (error) {
-                alert(error.message || 'No se pudo actualizar el perfil en la base de datos.');
-                return;
-            }
+        try {
+            await updateProfileInDatabase(dbProfileId, {
+                name,
+                username: normalizedUsername,
+                bio,
+                avatar,
+                banner,
+            });
+        } catch (error) {
+            alert(error.message || 'No se pudo actualizar el perfil en la base de datos.');
+            return;
         }
 
-        chars[index] = {
-            ...chars[index],
-            name,
-            username: normalizedUsername,
-            bio,
-            avatar,
-            banner,
-        };
-
-        setCharacters(chars);
+        await loadSocialDataFromDatabase();
         closeEditProfileModal();
         renderProfiles();
         renderFeed();
         renderComposerAvatar();
-        openProfileDetail(chars[index].id);
+        openProfileDetail(profileIdToOpen);
     }
 
     async function deleteProfile() {
@@ -2012,11 +2082,7 @@
             }
         }
 
-        const chars = getCharacters().filter(item => item.id !== editingProfileId);
-        const posts = getPosts().filter(post => post.characterId !== editingProfileId);
-
-        setCharacters(chars);
-        setPosts(posts);
+        await loadSocialDataFromDatabase();
 
         selectedProfileId = null;
         closeEditProfileModal();
@@ -2204,7 +2270,13 @@
 
     window.addEventListener('resize', clampWindowIntoViewport);
 
-    function bootstrapSocial() {
+    async function bootstrapSocial() {
+        try {
+            await loadSocialDataFromDatabase();
+        } catch (error) {
+            alert(error.message || 'No se pudieron cargar los datos sociales.');
+        }
+
         renderComposerAvatar();
         renderFeed();
         renderProfiles();
