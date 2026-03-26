@@ -58,10 +58,12 @@ Route::post('/biblioteca/libros/{book}/asignaciones', [LibraryController::class,
 Route::delete('/biblioteca/libros/{book}/asignaciones/{chapter}', [LibraryController::class, 'deleteAssignment']);
 
 Route::get('/music/playlists', [MusicController::class, 'playlists']);
+Route::get('/music/media/{path}', [MusicController::class, 'media'])->where('path', '.*')->name('music.media');
 Route::post('/music/upload-cover', [MusicController::class, 'uploadCover']);
 Route::post('/music/playlists', [MusicController::class, 'storePlaylist']);
 Route::put('/music/playlists/{playlist}', [MusicController::class, 'updatePlaylist']);
 Route::delete('/music/playlists/{playlist}', [MusicController::class, 'deletePlaylist']);
+Route::get('/music/tracks', [MusicController::class, 'tracks']);
 Route::post('/music/tracks', [MusicController::class, 'storeTrack']);
 Route::delete('/music/tracks/{track}', [MusicController::class, 'deleteTrack']);
 

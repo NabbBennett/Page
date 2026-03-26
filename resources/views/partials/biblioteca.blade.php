@@ -564,6 +564,11 @@
 	}
 
 	@media (max-width: 768px) {
+		#libraryModal .modal-backdrop {
+			align-items: flex-start;
+			padding: 8px 6px;
+		}
+
 		#libraryModal .library-window {
 			top: 0;
 			left: 0;
@@ -728,9 +733,10 @@
 		}
 
 		#libraryModal .modal-box {
-			width: calc(100% - 12px);
-			max-height: calc(100% - 12px);
+			width: 100%;
+			max-height: calc(100dvh - 16px);
 			padding: 12px;
+			border-radius: 12px;
 		}
 
 		#libraryModal #libraryFormModal {
@@ -740,12 +746,12 @@
 
 		#libraryModal #libraryFormModal .modal-box {
 			width: 100%;
-			max-height: calc(100dvh - 88px);
+			max-height: calc(100dvh - 16px);
 			padding: 10px;
 		}
 
 		#libraryModal #libraryCoverZone {
-			min-height: 200px;
+			min-height: 156px;
 		}
 
 		#libraryModal #libraryCoverZone .upload-preview {

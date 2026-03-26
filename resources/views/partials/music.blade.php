@@ -340,6 +340,8 @@
         color: #fff;
     }
 
+
+
     #musicModal .hero-pill-btn {
         width: 38px;
         height: 38px;
@@ -715,8 +717,12 @@
 
     #musicModal .btn.ghost {
         background: transparent;
-        color: var(--music-primary);
+        color: var(--music-bg);
         border: 1px solid var(--music-border);
+    }
+
+    body.dark-mode #musicModal .btn.ghost {
+        color: var(--music-text);
     }
 
     #musicModal .btn.danger {

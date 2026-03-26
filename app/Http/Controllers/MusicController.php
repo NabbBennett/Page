@@ -11,6 +11,8 @@ use Illuminate\Support\Str;
 
 class MusicController extends Controller
 {
+    private const DEFAULT_COVER = 'storage/photo/NABBLOGO_BLANCO.png';
+
     public function playlists(): JsonResponse
     {
         if ($unauthorized = $this->ensureAdmin()) {
@@ -30,21 +32,17 @@ class MusicController extends Controller
                     'id' => $playlist->id,
                     'name' => $playlist->name,
                     'description' => $playlist->description,
-                    'cover_url' => $this->resolveCoverUrl($playlist->cover_url),
+                    'cover_url' => $this->resolveMediaUrl($playlist->cover_url, asset(self::DEFAULT_COVER)),
                     'tracks' => $playlist->tracks->map(function (MusicTrack $track) {
                         return [
                             'id' => $track->id,
                             'title' => $track->title,
                             'artist' => $track->artist,
                             'album' => $track->album,
-                            'audio_url' => Str::startsWith((string) $track->audio_url, ['/storage/', 'storage/'])
-                                ? asset(ltrim((string) $track->audio_url, '/'))
-                                : $track->audio_url,
+                            'audio_url' => $this->resolveMediaUrl($track->audio_url),
                             'youtube_url' => $track->youtube_url,
                             'youtube_video_id' => $track->youtube_video_id,
-                            'thumbnail_url' => Str::startsWith((string) $track->thumbnail_url, ['/storage/', 'storage/'])
-                                ? asset(ltrim((string) $track->thumbnail_url, '/'))
-                                : $track->thumbnail_url,
+                            'thumbnail_url' => $this->resolveMediaUrl($track->thumbnail_url, asset(self::DEFAULT_COVER)),
                             'embed_url' => $track->embed_url,
                             'duration_seconds' => $track->duration_seconds,
                             'position' => $track->position,
@@ -66,13 +64,12 @@ class MusicController extends Controller
         ]);
 
         $path = $validated['cover']->store('music-covers', 'public');
-        $dbPath = 'storage\\app\\public\\'.str_replace('/', '\\', $path);
 
         return response()->json([
             'message' => 'Portada subida correctamente.',
-            'cover_url' => $dbPath,
+            'cover_url' => $path,
             'cover_path' => $path,
-            'cover_public_url' => asset('storage/'.$path),
+            'cover_public_url' => route('music.media', ['path' => $path]),
         ], 201);
     }
 
@@ -167,10 +164,10 @@ class MusicController extends Controller
             'title' => trim((string) $validated['title']),
             'artist' => trim((string) $validated['artist']),
             'album' => trim((string) $validated['album']),
-            'audio_url' => asset('storage/'.$audioPath),
+            'audio_url' => $audioPath,
             'youtube_url' => '',
             'youtube_video_id' => '',
-            'thumbnail_url' => asset('storage/'.$coverPath),
+            'thumbnail_url' => $coverPath,
             'embed_url' => '',
             'duration_seconds' => null,
             'position' => $lastPosition + 1,
@@ -185,8 +182,6 @@ class MusicController extends Controller
                 'artist' => $track->artist,
                 'album' => $track->album,
                 'audio_url' => $track->audio_url,
-                'youtube_url' => $track->youtube_url,
-                'youtube_video_id' => $track->youtube_video_id,
                 'thumbnail_url' => $track->thumbnail_url,
                 'embed_url' => $track->embed_url,
                 'duration_seconds' => $track->duration_seconds,
@@ -202,15 +197,38 @@ class MusicController extends Controller
         }
 
         foreach ([$track->audio_url, $track->thumbnail_url] as $url) {
-            $path = trim((string) parse_url((string) $url, PHP_URL_PATH), '/');
-            if (Str::startsWith($path, 'storage/')) {
-                Storage::disk('public')->delete(Str::after($path, 'storage/'));
+            $relativePath = $this->extractPublicRelativePath((string) $url);
+            if ($relativePath !== null) {
+                Storage::disk('public')->delete($relativePath);
             }
         }
 
         $track->delete();
 
         return response()->json(['message' => 'Canción eliminada correctamente.']);
+    }
+
+    public function media(string $path)
+    {
+        if ($unauthorized = $this->ensureAdminOrGuest()) {
+            return $unauthorized;
+        }
+
+        $normalizedPath = ltrim(str_replace('\\', '/', $path), '/');
+
+        if (str_contains($normalizedPath, '..')) {
+            abort(404);
+        }
+
+        if (!Str::startsWith($normalizedPath, ['music-covers/', 'music-tracks/'])) {
+            abort(404);
+        }
+
+        if (!Storage::disk('public')->exists($normalizedPath)) {
+            abort(404);
+        }
+
+        return Storage::disk('public')->response($normalizedPath);
     }
 
     private function ensureAdmin(): ?JsonResponse
@@ -222,12 +240,47 @@ class MusicController extends Controller
         return null;
     }
 
-    private function resolveCoverUrl(?string $coverUrl): ?string
+    private function ensureAdminOrGuest(): ?JsonResponse
     {
-        $value = (string) $coverUrl;
+        if (!in_array(session('user_type'), ['admin', 'guest'], true)) {
+            return response()->json(['message' => 'No autorizado'], 403);
+        }
+
+        return null;
+    }
+
+    private function resolveMediaUrl(?string $value, ?string $fallback = null): ?string
+    {
+        $value = trim((string) $value);
+        if ($value === '') {
+            return $fallback;
+        }
+
+        if (Str::startsWith($value, ['data:image/', 'data:audio/'])) {
+            return $value;
+        }
+
+        $relativePath = $this->extractPublicRelativePath($value);
+
+        if ($relativePath !== null) {
+            if (Storage::disk('public')->exists($relativePath)) {
+                return route('music.media', ['path' => $relativePath]);
+            }
+
+            return $fallback;
+        }
+
+        return $value;
+    }
+
+    private function extractPublicRelativePath(string $value): ?string
+    {
+        if (Str::startsWith($value, ['music-covers/', 'music-tracks/'])) {
+            return $value;
+        }
 
         if (Str::startsWith($value, ['/storage/', 'storage/'])) {
-            return asset(ltrim($value, '/'));
+            return ltrim(Str::after($value, 'storage/'), '/');
         }
 
         if (Str::startsWith($value, ['storage\\app\\public\\', 'storage/app/public/'])) {
@@ -235,9 +288,16 @@ class MusicController extends Controller
                 ? 'storage\\app\\public\\'
                 : 'storage/app/public/');
 
-            return asset('storage/'.str_replace('\\', '/', $relativeFile));
+            return ltrim(str_replace('\\', '/', $relativeFile), '/');
         }
 
-        return $coverUrl;
+        if (filter_var($value, FILTER_VALIDATE_URL)) {
+            $parsedPath = trim((string) parse_url($value, PHP_URL_PATH), '/');
+            if (Str::startsWith($parsedPath, 'storage/')) {
+                return Str::after($parsedPath, 'storage/');
+            }
+        }
+
+        return null;
     }
 }
