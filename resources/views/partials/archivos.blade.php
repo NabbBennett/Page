@@ -364,6 +364,16 @@
 	}
 
 	@media (max-width: 768px) {
+		#filesModal {
+			--mobile-bottom-clearance: 84px;
+		}
+
+		#filesModal .modal-backdrop {
+			align-items: flex-start;
+			padding: 8px 6px calc(var(--mobile-bottom-clearance) + env(safe-area-inset-bottom, 0px));
+			overflow-y: auto;
+		}
+
 		#filesModal .files-window {
 			top: 0;
 			left: 0;
@@ -414,8 +424,11 @@
 
 		#filesModal .modal-box {
 			padding: 12px;
-			width: calc(100% - 12px);
-			max-height: calc(100% - 12px);
+			width: 100%;
+			max-height: calc(100dvh - 16px - var(--mobile-bottom-clearance) - env(safe-area-inset-bottom, 0px));
+			border-radius: 12px;
+			overflow-y: auto;
+			-webkit-overflow-scrolling: touch;
 		}
 	}
 
@@ -735,7 +748,7 @@
 		const files = data.files.filter(file => file.folderId === folderId);
 
 		document.getElementById('filesBody').innerHTML = `
-			<div class="top-bar" style="grid-template-columns: 1fr auto auto;">
+			<div class="top-bar">
 				<button class="ghost-btn" type="button" onclick="renderFolderGrid()"><i class="fa-solid fa-arrow-left"></i> Volver a Carpetas</button>
 				${filesIsAdmin() ? `<button class="ghost-btn" type="button" onclick="openEditFolderModal('${folder.id}')"><i class="fa-solid fa-pen-to-square"></i> Editar carpeta</button>` : ''}
 				${filesIsAdmin() ? `<button class="primary-btn" type="button" onclick="openUploadImageModal('${folder.id}')"><i class="fa-solid fa-plus"></i> Subir Imagen</button>` : ''}

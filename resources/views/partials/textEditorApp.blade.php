@@ -500,6 +500,26 @@
         border-color: #b3261e;
         color: #fff;
     }
+
+    @media (max-width: 768px) {
+        #editorModal .save-modal-backdrop,
+        #editorModal .drafts-modal-backdrop {
+            align-items: flex-start;
+            padding: 8px 6px;
+        }
+
+        #editorModal .save-modal,
+        #editorModal .drafts-modal {
+            width: 100%;
+            max-height: calc(100dvh - 16px);
+            padding: 12px;
+            border-radius: 12px;
+        }
+
+        #editorModal .save-modal-title {
+            font-size: 1.5rem;
+        }
+    }
 </style>
 
 <div class="text-editor-window" id="editorWindow">

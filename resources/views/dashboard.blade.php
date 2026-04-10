@@ -618,8 +618,23 @@
                     display: none !important;
                 }
 
+                .dashboard-bg {
+                    min-height: 100dvh;
+                    height: auto;
+                }
+
                 .bottom-bar {
+                    position: fixed;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
                     padding: 0.75rem 1rem;
+                    padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+                    z-index: 2400;
+                }
+
+                .dashboard-main {
+                    padding-bottom: 5.5rem;
                 }
 
                 .floating-app .text-editor-window,
@@ -646,7 +661,7 @@
         </div>
 
         <!-- Main Content -->
-        <div class="flex-1 flex">
+        <div class="flex-1 flex dashboard-main">
             <!-- Left Sidebar -->
             <div class="w-24 pt-8 pb-32 px-4 flex flex-col gap-12">
                 <!-- Editor de Texto - Solo para Admin -->

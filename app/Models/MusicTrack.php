@@ -16,8 +16,6 @@ class MusicTrack extends Model
         'artist',
         'album',
         'audio_url',
-        'youtube_url',
-        'youtube_video_id',
         'thumbnail_url',
         'embed_url',
         'duration_seconds',

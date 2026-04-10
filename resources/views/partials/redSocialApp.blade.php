@@ -774,6 +774,17 @@
     }
 
     @media (max-width: 768px) {
+        #socialModal .modal-backdrop {
+            align-items: flex-start;
+            padding: 8px 6px;
+        }
+
+        #socialModal #profileModal,
+        #socialModal #editProfileModal {
+            align-items: flex-start;
+            padding: 8px 6px 76px;
+        }
+
         #socialModal .left-menu {
             width: 62px;
             padding: 6px;
@@ -825,9 +836,15 @@
         }
 
         #socialModal .modal-box {
-            width: calc(100% - 12px);
-            max-height: calc(100% - 12px);
+            width: 100%;
+            max-height: calc(100dvh - 16px);
             padding: 12px;
+            border-radius: 12px;
+        }
+
+        #socialModal #profileModal .modal-box,
+        #socialModal #editProfileModal .modal-box {
+            max-height: calc(100dvh - 92px);
         }
 
         #socialModal .row-2,
@@ -838,6 +855,18 @@
 
         #socialModal .upload-zone {
             min-height: 110px;
+        }
+
+        #socialModal #profileModal .upload-zone,
+        #socialModal #editProfileModal .upload-zone {
+            min-height: 92px;
+        }
+
+        #socialModal #profileModal .upload-zone.round-preview .upload-preview,
+        #socialModal #editProfileModal .upload-zone.round-preview .upload-preview {
+            width: 88px;
+            height: 88px;
+            margin: 8px auto;
         }
     }
 
@@ -864,6 +893,22 @@
     }
 
     @media (max-width: 420px) {
+        #socialModal #profileModal,
+        #socialModal #editProfileModal {
+            padding-bottom: 84px;
+        }
+
+        #socialModal #profileModal .modal-box,
+        #socialModal #editProfileModal .modal-box {
+            max-height: calc(100dvh - 100px);
+            padding: 10px;
+        }
+
+        #socialModal #profileModal .upload-zone,
+        #socialModal #editProfileModal .upload-zone {
+            min-height: 84px;
+        }
+
         #socialModal .post-action-btn {
             padding: 8px 0;
             gap: 0;
