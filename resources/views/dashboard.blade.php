@@ -39,6 +39,7 @@
                 font-family: 'Roboto Condensed', sans-serif;
                 height: 100dvh;
                 overflow: hidden;
+                padding-bottom: 72px;
             }
 
             @keyframes menuSlideUp {
@@ -92,7 +93,10 @@
                 background-color: rgba(40, 40, 40, 0.85);
                 padding: 1rem 2rem;
                 color: white;
-                position: relative;
+                position: fixed;
+                left: 0;
+                right: 0;
+                bottom: 0;
                 z-index: 1200;
             }
 
