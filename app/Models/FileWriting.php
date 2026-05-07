@@ -15,5 +15,10 @@ class FileWriting extends Model
         'title',
         'text_content',
         'html_content',
+        'is_draft',
+    ];
+
+    protected $casts = [
+        'is_draft' => 'boolean',
     ];
 }

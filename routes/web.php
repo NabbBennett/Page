@@ -44,6 +44,9 @@ Route::get('/archivos', [FileController::class, 'index'])->name('archivos');
 Route::get('/archivos/escritos', [FileController::class, 'writings']);
 Route::post('/archivos/escritos', [FileController::class, 'storeWriting']);
 Route::delete('/archivos/escritos/{writing}', [FileController::class, 'deleteWriting']);
+Route::get('/archivos/borradores', [FileController::class, 'drafts']);
+Route::post('/archivos/borradores', [FileController::class, 'storeDraft']);
+Route::delete('/archivos/borradores/{writing}', [FileController::class, 'deleteDraft']);
 
 Route::get('/archivos/carpetas', [FileController::class, 'folders']);
 Route::post('/archivos/carpetas', [FileController::class, 'storeFolder']);

@@ -20,6 +20,7 @@ class FileController extends Controller
     {
         $query = FileWriting::query()
             ->where('user_type', 'admin')
+            ->where('is_draft', false)
             ->orderByDesc('id');
 
         $writings = $query->get()->map(function (FileWriting $writing) {
@@ -45,6 +46,105 @@ class FileController extends Controller
         return response()->json(['writings' => $writings]);
     }
 
+    public function drafts()
+    {
+        $query = FileWriting::query()
+            ->where('user_type', 'admin')
+            ->where('is_draft', true)
+            ->orderByDesc('updated_at')
+            ->orderByDesc('id');
+
+        $drafts = $query->get()->map(fn (FileWriting $draft) => [
+            'id' => $draft->id,
+            'title' => $draft->title,
+            'text_content' => $draft->text_content,
+            'html_content' => $draft->html_content,
+            'created_at' => $draft->created_at?->toISOString(),
+            'updated_at' => $draft->updated_at?->toISOString(),
+        ])->values();
+
+        return response()->json(['drafts' => $drafts]);
+    }
+
+    public function storeDraft(Request $request)
+    {
+        if ($unauthorized = $this->ensureAdmin()) {
+            return $unauthorized;
+        }
+
+        $validated = $request->validate([
+            'draft_id' => ['nullable', 'integer', 'exists:file_writings,id'],
+            'title' => ['nullable', 'string', 'max:255'],
+            'text_content' => ['nullable', 'string'],
+            'html_content' => ['nullable', 'string'],
+        ]);
+
+        $textContent = trim((string) ($validated['text_content'] ?? ''));
+        $htmlContent = trim((string) ($validated['html_content'] ?? ''));
+
+        if ($textContent === '' && $htmlContent === '') {
+            return response()->json(['message' => 'El borrador no puede estar vacío.'], 422);
+        }
+
+        $title = trim((string) ($validated['title'] ?? ''));
+        if ($title === '') {
+            $title = mb_substr($textContent, 0, 52) ?: 'Borrador sin título';
+        }
+
+        $draft = null;
+        if (!empty($validated['draft_id'])) {
+            $draft = FileWriting::query()
+                ->where('id', (int) $validated['draft_id'])
+                ->where('user_type', 'admin')
+                ->where('is_draft', true)
+                ->first();
+        }
+
+        if ($draft) {
+            $draft->update([
+                'title' => $title,
+                'text_content' => $textContent,
+                'html_content' => $htmlContent,
+            ]);
+        } else {
+            $draft = FileWriting::query()->create([
+                'user_type' => (string) session('user_type', 'guest'),
+                'user_id' => session('user_id'),
+                'title' => $title,
+                'text_content' => $textContent,
+                'html_content' => $htmlContent,
+                'is_draft' => true,
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Borrador guardado correctamente.',
+            'draft' => [
+                'id' => $draft->id,
+                'title' => $draft->title,
+                'text_content' => $draft->text_content,
+                'html_content' => $draft->html_content,
+                'created_at' => $draft->created_at?->toISOString(),
+                'updated_at' => $draft->updated_at?->toISOString(),
+            ],
+        ]);
+    }
+
+    public function deleteDraft(FileWriting $writing)
+    {
+        if ($unauthorized = $this->ensureAdmin()) {
+            return $unauthorized;
+        }
+
+        if (!(bool) $writing->is_draft) {
+            return response()->json(['message' => 'El registro indicado no es un borrador.'], 422);
+        }
+
+        $writing->delete();
+
+        return response()->json(['message' => 'Borrador eliminado correctamente.']);
+    }
+
     public function storeWriting(Request $request)
     {
         if ($unauthorized = $this->ensureAdmin()) {
@@ -62,8 +162,8 @@ class FileController extends Controller
 
         $textContent = trim((string) ($validated['text_content'] ?? ''));
         $htmlContent = trim((string) ($validated['html_content'] ?? ''));
-
-        if ($textContent === '' && $htmlContent === '') {
+        $imagePath = trim((string) ($validated['image_path'] ?? ''));
+        if ($textContent === '' && $htmlContent === '' && $imagePath === '') {
             return response()->json(['message' => 'El escrito no puede estar vacío.'], 422);
         }
 
@@ -74,10 +174,10 @@ class FileController extends Controller
             'title' => trim((string) $validated['title']),
             'text_content' => $textContent !== '' ? $textContent : null,
             'html_content' => $htmlContent !== '' ? $htmlContent : null,
+            'is_draft' => false,
         ]);
 
         $folderId = isset($validated['folder_id']) ? (int) $validated['folder_id'] : null;
-        $imagePath = trim((string) ($validated['image_path'] ?? ''));
 
         if ($folderId || $imagePath !== '' || $password !== '') {
             FileWritingAssignment::query()->create([
@@ -97,7 +197,6 @@ class FileController extends Controller
                 'folder_id' => $folderId,
                 'title' => $writing->title,
                 'text_content' => $writing->text_content,
-                'html_content' => $writing->html_content,
                 'image_path' => $imagePath !== '' ? $imagePath : null,
                 'is_encrypted' => $password !== '',
                 'password' => $password !== '' ? $password : null,
