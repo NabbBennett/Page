@@ -823,7 +823,19 @@
         return safeText.slice(0, 120);
     }
 
-    function persistCurrentContentAsDraft() {
+    async function loadEditorDrafts() {
+        try {
+            const data = await editorApi('/archivos/borradores');
+            const drafts = Array.isArray(data?.drafts) ? data.drafts : [];
+            setEditorDrafts(drafts);
+            return drafts;
+        } catch (error) {
+            console.error('Error loading drafts:', error);
+            return [];
+        }
+    }
+
+    async function persistCurrentContentAsDraft() {
         const html = getEditorContentHtml();
         const text = getEditorContentText();
 
@@ -831,39 +843,28 @@
             return null;
         }
 
-        const drafts = getEditorDrafts();
-        const now = new Date().toISOString();
         const draftTitle = buildDraftTitleFromText(text);
 
-        if (currentDraftId) {
-            const index = drafts.findIndex(item => item.id === currentDraftId);
-            if (index !== -1) {
-                drafts[index] = {
-                    ...drafts[index],
+        try {
+            const response = await editorApi('/archivos/borradores', {
+                method: 'POST',
+                body: JSON.stringify({
+                    draft_id: currentDraftId || null,
                     title: draftTitle,
-                    preview: buildDraftPreviewFromText(text),
-                    htmlContent: html,
-                    textContent: text,
-                    updatedAt: now,
-                };
-                setEditorDrafts(drafts);
-                return currentDraftId;
-            }
-        }
+                    text_content: text,
+                    html_content: html,
+                }),
+            });
 
-        const newDraftId = `draft-${Date.now()}`;
-        drafts.unshift({
-            id: newDraftId,
-            title: draftTitle,
-            preview: buildDraftPreviewFromText(text),
-            htmlContent: html,
-            textContent: text,
-            createdAt: now,
-            updatedAt: now,
-        });
-        setEditorDrafts(drafts);
-        currentDraftId = newDraftId;
-        return newDraftId;
+            if (response?.draft) {
+                currentDraftId = response.draft.id;
+                return response.draft.id;
+            }
+            return null;
+        } catch (error) {
+            console.error('Error saving draft:', error);
+            return null;
+        }
     }
 
     function removeCurrentDraftIfExists() {
@@ -878,7 +879,7 @@
         if (!wrap) return;
 
         const drafts = getEditorDrafts().sort((a, b) => {
-            return new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime();
+            return new Date(b.updated_at || 0).getTime() - new Date(a.updated_at || 0).getTime();
         });
 
         if (drafts.length === 0) {
@@ -890,8 +891,8 @@
             <div class="draft-item ${currentDraftId === draft.id ? 'active' : ''}">
                 <div style="min-width:0;">
                     <div class="draft-title">${escapeEditorHtml(draft.title || 'Borrador sin título')}</div>
-                    <div class="draft-preview">${escapeEditorHtml(draft.preview || 'Sin contenido')}</div>
-                    <div class="draft-meta">Actualizado: ${escapeEditorHtml(formatDraftDate(draft.updatedAt || draft.createdAt))}</div>
+                    <div class="draft-preview">${escapeEditorHtml(buildDraftPreviewFromText(draft.text_content || ''))}</div>
+                    <div class="draft-meta">Actualizado: ${escapeEditorHtml(formatDraftDate(draft.updated_at || draft.created_at))}</div>
                 </div>
                 <div class="draft-actions">
                     <button type="button" class="draft-action-btn" onclick="loadDraftIntoEditor('${draft.id}')">Continuar</button>
@@ -901,8 +902,9 @@
         `).join('');
     }
 
-    function openDraftsModal() {
-        persistCurrentContentAsDraft();
+    async function openDraftsModal() {
+        await persistCurrentContentAsDraft();
+        await loadEditorDrafts();
         renderDraftsList();
         document.getElementById('draftsEditorModal')?.classList.add('active');
     }
@@ -913,32 +915,42 @@
 
     function loadDraftIntoEditor(draftId) {
         const drafts = getEditorDrafts();
-        const draft = drafts.find(item => item.id === draftId);
+        const draft = drafts.find(item => item.id === parseInt(draftId));
         if (!draft) {
             alert('No se encontró el borrador seleccionado.');
-            renderDraftsList();
             return;
         }
 
         const editor = document.getElementById('editorRichContent');
         if (!editor) return;
 
-        editor.innerHTML = draft.htmlContent || '';
+        editor.innerHTML = draft.html_content || '';
         editor.focus();
         currentDraftId = draft.id;
         closeDraftsModal();
         resetEditorHeaderTitle();
     }
 
-    function deleteDraftById(draftId) {
-        const drafts = getEditorDrafts().filter(item => item.id !== draftId);
-        setEditorDrafts(drafts);
-
-        if (currentDraftId === draftId) {
-            currentDraftId = null;
+    async function deleteDraftById(draftId) {
+        if (!confirm('¿Estás seguro de que deseas eliminar este borrador?')) {
+            return;
         }
 
-        renderDraftsList();
+        try {
+            await editorApi(`/archivos/borradores/${draftId}`, {
+                method: 'DELETE',
+            });
+
+            if (currentDraftId === parseInt(draftId)) {
+                currentDraftId = null;
+            }
+
+            await loadEditorDrafts();
+            renderDraftsList();
+        } catch (error) {
+            alert(error.message || 'No se pudo eliminar el borrador.');
+            console.error('Error deleting draft:', error);
+        }
     }
 
     function startBlankDraft() {
@@ -1270,6 +1282,8 @@
 
         const btn = document.querySelector('#editorModal .maximize-btn');
         if (btn) btn.innerHTML = '<i class="fas fa-square"></i>';
+
+        loadEditorDrafts().catch(err => console.error('Error loading drafts on open:', err));
     }
 
     function openEditorMaximized() {
@@ -1433,8 +1447,8 @@
         if (editor) {
             editor.addEventListener('input', () => {
                 if (editorDraftSaveTimeout) clearTimeout(editorDraftSaveTimeout);
-                editorDraftSaveTimeout = setTimeout(() => {
-                    persistCurrentContentAsDraft();
+                editorDraftSaveTimeout = setTimeout(async () => {
+                    await persistCurrentContentAsDraft();
                 }, 700);
             });
         }
